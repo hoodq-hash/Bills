@@ -1,0 +1,135 @@
+.footer {
+ margin-top: 1em;
+}
+
+.mainContainer{
+  background-color: #0A2A4A;
+  color: white;
+  padding: 40px 20px;
+}
+.container {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1200px;
+  gap: 3em;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  border-bottom: 3px solid white;
+  /* background-color: red; */
+}
+
+.logo {
+  margin-bottom: 20px;
+}
+
+.logo p{
+  margin: 5px 0;
+  color: #ddd;
+}
+
+.linksSection {
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.column {
+  margin: 0 20px;
+}
+
+.column h3 {
+  color: white;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.column ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.column ul li {
+  margin-bottom: 19px;
+  position: relative;
+}
+
+.column ul li::before {
+  content: '›';
+  color: #90ee90;
+  font-size: 18px;
+  position: absolute;
+  left: -15px;
+  top: 0;
+}
+
+
+.column ul li a {
+  /* border-bottom: 1px solid #ddddddaa; */
+  color:  #ffffff;
+  text-decoration: none;
+}
+
+.column ul li a:hover {
+  color: #155ba7;
+  text-decoration: underline;
+}
+
+.copyright {
+  /* display: flex; */
+  text-align: center;
+  padding-top: 1.5em;
+  background-color: black;
+  color: #ffffff;
+  height: 50px;
+  font-size: 14px;
+}
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column; /* Stacks the sections vertically */
+    /* align-items: center;  */
+    width: 100%;
+  }
+
+  .linksSection {
+    flex-direction: column;
+    align-items: center; 
+    /* background-color: red; */
+    margin-top: 20px;
+  }
+  
+  .column {
+    margin: 0 0 20px;
+    /* margin-left: -2em;  */
+    /* background-color: red; */
+    /* text-align: center;  */
+  }
+
+  .logoSection {
+    text-align: center;
+  }
+
+  .logoSection p {
+    text-align: center;
+  }
+
+}
+@media (max-width: 480px) {
+  .container {
+    /* padding: 20px; */
+    /* align-items: start; */
+    margin-left: 0;
+    /* background-color: red; */
+  }
+   
+  .column h3{
+    font-size: 25px;
+    color: #155ba7;
+  }
+  .column ul li {
+    margin-bottom: 15px;
+  }
+
+  .copyright {
+    font-size: 12px; /* Reduces font size for smaller screens */
+  }
+}

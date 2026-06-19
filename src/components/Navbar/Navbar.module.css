@@ -1,0 +1,483 @@
+/* Desktop styles (1025px and wider) */
+@media screen and (min-width: 1025px) {
+    .menu {
+        display: none;
+    }
+    /* Main Navbar container */
+    .mainNav {
+        display: flex;
+        justify-content: space-between;
+        background-color: #0A2A4A;
+        padding: 2em;
+        width: 100%;
+        align-items: center;
+    }
+
+    /* Links within the mainNav (Logo, Cart, Search) */
+    .mainNav a {
+        color: #4682B4;
+        text-decoration: none; 
+        font-size: 20px;
+    }
+
+    .mainNav a:hover {
+        color: #155ba7;
+    }
+
+    /* Second navigation container (cart, price) */
+    .mainNav2 {
+        display: flex;
+        gap: 1em; 
+        align-items: center; 
+        padding-right: 5em;
+    }
+
+    .mainNav2 p {
+        color: white;
+    }
+
+    .mainNav2 p:hover {
+        color: #4682B4;
+    }
+
+    .mainNav2 a:hover {
+        color: #155ba7;
+    }
+
+    /* Search bar container */
+    .searchContainer1{
+        display: none;
+    }
+    .searchContainer {
+        display: flex;
+        align-items: center;
+        background-color: #ffffff; /* Light background for the input */
+        padding: 0.3em;
+        border-radius: 50px; /* Fully rounded input */
+        width: 500px; /* Adjust width as needed */
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* Adds shadow for depth */
+        position: relative;
+    }
+
+    .searchInput {
+        background-color: transparent;
+        border: none;
+        outline: none;
+        color: #0A2A4A; 
+        padding: 0.5em 1em;
+        flex: 1; /* Takes up remaining space */
+        font-size: 16px;
+    }
+
+    .searchInput::placeholder {
+        color: #0A2A4A; /* Placeholder color */
+    }
+
+    .searchIcon {
+        color: #4682B4; 
+        margin-right: 1em;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .searchIcon:hover {
+        color: #155ba7;
+    }
+
+    /* Cart Icon Container */
+    .cartIconContainer {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* Cart Badge styling */
+    .cartBadge {
+        position: absolute;
+        top: -10px; /* Adjust to position the badge above the icon */
+        right: -10px; /* Adjust as per your icon size */
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    /* Nav Links section (the links under the navbar) */
+    .navLinksContainer {
+        display: block;
+        background-color: #f5f5f5; /* Light background for the secondary nav */
+        padding: 1em 0; /* Vertical padding for spacing */
+        text-align: center; /* Center the links */
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+
+    /* Styling for the navigation links */
+    .navLinksContainer nav {
+        display: flex;
+        justify-content: center;
+        gap: 2em;
+    }
+
+    .navLinksContainer a {
+        text-decoration: none;
+        color: #0A2A4A;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .navLinksContainer a:hover {
+        color: #4682B4;
+    }
+}
+
+/* Tablet styles (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .mainNav {
+        display: flex;
+        justify-content: space-between;
+        background-color: #0A2A4A;
+        padding: 2em;
+        width: 100%;
+        align-items: center;
+    }
+
+    .mainNav a {
+        color: #4682B4;
+        text-decoration: none;
+        font-size: 18px; /* Slightly smaller font */
+    }
+
+    .mainNav2 {
+        display: flex;
+        gap: 1em;
+        align-items: center;
+        padding-right: 2em;
+    }
+
+    .mainNav2 p {
+        color: white;
+        font-size: 16px;
+    }
+
+    .menu {
+        display: block; /* Hamburger menu appears */
+        margin-left: 1em;
+    }
+
+    /* Hide the search bar in mainNav */
+    .searchContainer {
+        display: none;
+    }
+
+    /* Sidebar styles for tablet with search bar on top */
+    .navLinksContainer {
+        position: fixed;
+        top: 5.4em;
+        right: -100%;
+        width: 40%;
+        height: 100%;
+        background-color: #f5f5f5;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        transition: right 0.3s ease-in-out;
+    }
+
+    .navLinksContainer.active {
+        right: 0;
+    }
+
+    /* Search bar inside sidebar */
+    .searchContainer{
+        display: none;
+    }
+    .navLinksContainer .searchContainer {
+        display: flex;
+        align-items: center;
+        background-color: #ffffff; /* Light background for the input */
+        padding: 0.3em;
+        border-radius: 50px; /* Fully rounded input */
+        width: 100%;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* Adds shadow for depth */
+        margin-bottom: 1.5rem;
+    }
+
+    .navLinksContainer .searchInput {
+        background-color: transparent;
+        border: none;
+        outline: none;
+        color: #0A2A4A; 
+        padding: 0.5em 1em;
+        flex: 1;
+        font-size: 16px;
+    }
+
+    .navLinksContainer .searchInput::placeholder {
+        color: #0A2A4A; /* Placeholder color */
+    }
+
+    .navLinksContainer .searchIcon {
+        color: #4682B4; 
+        margin-right: 1em;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .navLinksContainer .searchIcon:hover {
+        color: #155ba7;
+    }
+
+    /* Styling for navigation links */
+    .navLinksContainer nav {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .navLinksContainer nav a {
+        display: block;
+        border-bottom: 1px solid #ddd;
+        padding: 1em 0;
+        color: #0A2A4A;
+        font-size: 1.2rem;
+        text-decoration: none;
+    }
+
+    .navLinksContainer nav a:hover {
+        color: #4682B4;
+    }
+
+    /* Cart Icon Container */
+    .cartIconContainer {
+        position: relative;
+        display: inline-block;
+    }
+
+    .cartIconContainer i {
+        font-size: 20px;
+    }
+
+    /* Cart Badge styling */
+    .cartBadge {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+}
+
+/* Mobile styles (767px and below) */
+@media (max-width: 767px) {
+    .mainNav {
+        display: flex;
+        justify-content: space-between;
+        background-color: #0A2A4A;
+        padding: 2em;
+        width: 100%;
+        align-items: center;
+    }
+
+    .mainNav a {
+        color: #4682B4;
+        text-decoration: none;
+        font-size: 16px;
+    }
+
+    .mainNav2 {
+        display: flex;
+        gap: 0.5em;
+        align-items: center;
+        padding-right: 1.5em;
+    }
+
+    .mainNav2 p {
+        color: white;
+        font-size: 14px;
+    }
+
+    .menu {
+        display: block;
+        margin-left: 1em;
+    }
+
+    /* Hide the search bar in mainNav */
+    .searchContainer {
+        display: none;
+    }
+
+    /* Sidebar styles for mobile with search bar on top */
+    .navLinksContainer {
+        position: fixed;
+        top: 5em;
+        right: -100%;
+        width: 60%;
+        height: 100%;
+        background-color: #f5f5f5;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        transition: right 0.3s ease-in-out;
+    }
+
+    .navLinksContainer.active {
+        right: 0;
+    }
+
+    /* Search bar inside sidebar */
+    .searchContainer{
+        display: none;
+    }
+    .navLinksContainer .searchContainer1 {
+        display: flex;
+        align-items: center;
+        background-color: #ffffff; /* Light background for the input */
+        padding: 0.3em;
+        border-radius: 50px; /* Fully rounded input */
+        width: 100%;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* Adds shadow for depth */
+        margin-bottom: 1.5rem;
+    }
+
+    .navLinksContainer .searchInput {
+        background-color: transparent;
+        border: none;
+        outline: none;
+        color: #0A2A4A; 
+        padding: 0.5em 1em;
+        flex: 1;
+        font-size: 16px;
+    }
+
+    .navLinksContainer .searchInput::placeholder {
+        color: #0A2A4A; /* Placeholder color */
+    }
+
+    .navLinksContainer .searchIcon {
+        color: #4682B4; 
+        margin-right: 1em;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .navLinksContainer .searchIcon:hover {
+        color: #155ba7;
+    }
+
+    /* Styling for navigation links */
+    .navLinksContainer nav {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .navLinksContainer nav a {
+        display: block;
+        border-bottom: 1px solid #ddd;
+        padding: 1em 0;
+        text-decoration: none;
+        color: #0A2A4A;
+        font-size: 1.1rem;
+    }
+
+    .navLinksContainer nav a:hover {
+        color: #4682B4;
+    }
+
+    /* Cart Icon Container */
+    .cartIconContainer {
+        position: relative;
+        display: inline-block;
+    }
+
+    .cartIconContainer i {
+        font-size: 20px;
+    }
+
+    /* Cart Badge styling */
+    .cartBadge {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+}
+/* ==========================  Smartwatch styles (up to 400px) =========================== */
+@media (max-width: 400px) {
+    
+    .mainNav {
+        display: flex;
+        /* justify-content: space-between; */
+        background-color: #0A2A4A;
+        padding: 1em;
+        width: 100%;
+        align-items: center;
+    }
+
+    .mainNav a {
+        color: #4682B4;
+        text-decoration: none;
+        font-size: 12px; /* Reduced font size */
+    }
+
+    .mainNav2 {
+        gap: 0.3em;
+        padding-right: 0.5em;
+    }
+
+    .mainNav2 p {
+        color: white;
+        font-size: 12px;
+    }
+/* 
+    .menu {
+        margin-left: 0.5em;
+    } */
+
+    /* Hide the search bar in mainNav */
+    .searchContainer {
+        display: none;
+    }
+
+    .navLinksContainer {
+        top: 4em;
+        width: 80%; /* Smaller width */
+        padding: 1rem;
+    }
+
+    .navLinksContainer .searchContainer1 {
+        border-radius: 25px; /* Slightly less rounded for space */
+        padding: 0.2em;
+    }
+
+    .navLinksContainer .searchInput {
+        font-size: 12px; /* Adjust font size */
+    }
+
+    .navLinksContainer nav a {
+        padding: 0.5em 0;
+        font-size: 0.9rem;
+    }
+
+    /* Cart Icon and Badge */
+    .cartIconContainer i {
+        font-size: 16px; /* Smaller icon */
+    }
+
+    .cartBadge {
+        top: -5px;
+        right: -5px;
+        padding: 1px 4px;
+        font-size: 10px;
+    }
+}

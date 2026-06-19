@@ -1,0 +1,26 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "eslint:recommended",
+    "plugin:react/recommended"
+  ],
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "no-undef": "warn",
+    "react/display-name": "off",
+    "no-dupe-keys": "off",
+    "react/prop-types": "off",
+    "no-unused-vars": "warn",
+    "react/no-unescaped-entities": "off",
+    "react/no-unknown-property": [
+      "error",
+      {
+        "ignore": ["jsx", "global"]
+      }
+    ]
+  }
+}

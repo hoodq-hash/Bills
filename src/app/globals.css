@@ -1,0 +1,64 @@
+@import "@fortawesome/fontawesome-free/css/all.min.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0a0a0f;
+  --foreground: #ffffff;
+  --elite-gold: #c5a059;
+  --elite-gold-light: #d4b36a;
+  --elite-gold-dark: #a8863f;
+}
+
+* {
+  font-family: var(--font-montserrat), system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-playfair), Georgia, serif;
+}
+
+@layer components {
+  .text-brand {
+    @apply text-elite-gold;
+  }
+
+  .text-brand-gradient {
+    @apply bg-gradient-to-r from-elite-gold via-elite-gold-light to-elite-gold bg-clip-text text-transparent;
+  }
+
+  .btn-primary {
+    @apply bg-elite-gold text-black font-sans font-semibold uppercase tracking-[0.15em] rounded-sm hover:bg-elite-gold-light transition-colors duration-300;
+  }
+
+  .btn-secondary {
+    @apply border border-white text-white font-sans font-semibold uppercase tracking-[0.15em] rounded-sm bg-transparent hover:border-elite-gold hover:text-elite-gold transition-colors duration-300;
+  }
+
+  .input-elite {
+    @apply bg-elite-card/50 border border-elite-border text-gray-100 placeholder-elite-muted focus:outline-none focus:ring-2 focus:ring-elite-gold focus:border-transparent;
+  }
+
+  .card-elite {
+    @apply bg-elite-surface border border-elite-border rounded-lg;
+  }
+}
