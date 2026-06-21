@@ -4,10 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const SLIDES = [
-  {
-    src: "/images/hero-elite-notes.png",
-    label: "Global Capital · Luxury",
-  },
+ 
   {
     src: "/images/dollarbill.jpeg",
     label: "Dubai · UAE",
