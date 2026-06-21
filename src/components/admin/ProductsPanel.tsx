@@ -14,8 +14,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Product, ProductFormData } from "@/types";
+import { ADMIN_CATEGORIES } from "@/constants/catalog";
 
-const CATEGORIES = ["USD", "CAD", "EURO", "GBP", "clone cards"];
+const CATEGORIES = [...ADMIN_CATEGORIES];
 
 const emptyForm: ProductFormData = {
   title: "",

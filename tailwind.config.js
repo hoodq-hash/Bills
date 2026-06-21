@@ -11,9 +11,9 @@ module.exports = {
         background: "var(--background)",
         foreground: "var(--foreground)",
         elite: {
-          bg: "#0a0a0f",
-          surface: "#12121a",
-          card: "#1a1a24",
+          bg: "#08080d",
+          surface: "#0f0f16",
+          card: "#16161f",
           border: "#2a2a35",
           gold: "#C5A059",
           "gold-light": "#d4b36a",
@@ -22,8 +22,8 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-montserrat)", "sans-serif"],
-        display: ["var(--font-playfair)", "Georgia", "serif"],
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        display: ["var(--font-cormorant)", "Georgia", "serif"],
       },
     },
   },

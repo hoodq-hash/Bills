@@ -8,21 +8,24 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Search, ShoppingCart, SlidersHorizontal } from "lucide-react";
 
-const BILL_CATEGORIES = ["USD", "CAD", "EURO", "GBP"] as const;
+import { ASCORBIC_ACID_CATEGORY, SHOP_CATEGORIES } from "@/constants/catalog";
 
-type BillCategory = (typeof BILL_CATEGORIES)[number] | "ALL";
+type ShopCategory = (typeof SHOP_CATEGORIES)[number];
 
-const FILTER_OPTIONS: { value: BillCategory; label: string }[] = [
-  { value: "ALL", label: "All Bills" },
+type FilterCategory = ShopCategory | "ALL";
+
+const FILTER_OPTIONS: { value: FilterCategory; label: string }[] = [
+  { value: "ALL", label: "All" },
   { value: "USD", label: "USD" },
   { value: "EURO", label: "EUR" },
   { value: "GBP", label: "GBP" },
   { value: "CAD", label: "CAD" },
+  { value: ASCORBIC_ACID_CATEGORY, label: "Ascorbic Acid" },
 ];
 
 export default function BillsPage() {
   const [bills, setBills] = useState<Product[]>([]);
-  const [category, setCategory] = useState<BillCategory>("ALL");
+  const [category, setCategory] = useState<FilterCategory>("ALL");
   const [sortOption, setSortOption] = useState("default");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -36,8 +39,8 @@ export default function BillsPage() {
         const data: Product[] = await res.json();
         setBills(
           data.filter((item) =>
-            BILL_CATEGORIES.includes(
-              item.category?.toUpperCase() as (typeof BILL_CATEGORIES)[number]
+            SHOP_CATEGORIES.some(
+              (cat) => cat.toLowerCase() === item.category?.toLowerCase()
             )
           )
         );
@@ -55,7 +58,7 @@ export default function BillsPage() {
 
     if (category !== "ALL") {
       result = result.filter(
-        (bill) => bill.category?.toUpperCase() === category
+        (bill) => bill.category?.toLowerCase() === category.toLowerCase()
       );
     }
 
@@ -87,7 +90,7 @@ export default function BillsPage() {
   return (
     <div className="min-h-screen bg-elite-bg">
       <div className="fixed top-0 left-0 w-full z-50">
-        <Navbar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+        <Navbar />
       </div>
 
       <div className="relative h-[50vh] min-h-[320px] w-full pt-16">
@@ -106,7 +109,7 @@ export default function BillsPage() {
             All Bills
           </h1>
           <p className="mt-4 text-white/80 max-w-2xl">
-            Browse and filter USD, EUR, GBP, and CAD bills in one place.
+            Browse and filter bills and ascorbic acid products in one place.
           </p>
         </div>
       </div>

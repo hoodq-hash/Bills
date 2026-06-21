@@ -66,7 +66,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-elite-bg">
       <div className="fixed top-0 left-0 w-full z-50">
-        <Navbar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+        <Navbar />
       </div>
       {/* Hero Section */}
       <div className="relative h-[70vh] lg:h-[80vh] w-full">

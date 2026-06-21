@@ -3,54 +3,57 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-  Lock,
-  Globe,
-  Headphones,
-  Package,
-  ShoppingCart,
-  ArrowRight,
-} from "lucide-react";
+import { ArrowRight, ShoppingCart } from "lucide-react";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
+import HeroSlider from "@/components/zenith/HeroSlider";
+import SectionHeading from "@/components/zenith/SectionHeading";
+import CountUpStat from "@/components/zenith/CountUpStat";
 import type { Product } from "@/types";
+import { SHOP_CATEGORIES } from "@/constants/catalog";
 
-const BILL_CATEGORIES = ["USD", "CAD", "EURO", "GBP"];
+const stats = [
+  { value: 10, suffix: "K+", label: "Orders Fulfilled" },
+  { value: 50, suffix: "+", label: "Premium Products" },
+  { value: 40, suffix: "+", label: "Countries Served" },
+  { value: 8, suffix: "+", label: "Years of Excellence" },
+];
 
-const features = [
+const services = [
   {
-    icon: Lock,
-    title: "Secure Transactions",
-    description: "End-to-end encryption for all your transactions",
+    title: "Premium Bills",
+    description:
+      "High-quality undetectable bills in USD, EUR, GBP, and CAD — crafted to pass standard checks and look genuine in hand.",
   },
   {
-    icon: Globe,
-    title: "Worldwide Acceptance",
-    description: "Bills accepted in stores and businesses worldwide",
+    title: "Discreet Delivery",
+    description:
+      "Every order ships with 100% confidential packaging and tracked delivery options worldwide.",
   },
   {
-    icon: Headphones,
-    title: "24/7 Support",
-    description: "Round-the-clock customer assistance",
+    title: "Ascorbic Acid",
+    description:
+      "Lab-grade and commercial ascorbic acid products available through our curated catalog with fast fulfillment.",
   },
   {
-    icon: Package,
-    title: "Discrete Shipping",
-    description: "100% confidential packaging and delivery",
+    title: "Long-Term Trust",
+    description:
+      "Trusted since 2018 — we build enduring relationships with clients who value quality, discretion, and reliability.",
   },
 ];
 
-function ProductGrid({
-  products,
-  emptyLabel = "No bills found",
-}: {
-  products: Product[];
-  emptyLabel?: string;
-}) {
+const markets = [
+  { flag: "🇺🇸", region: "United States", detail: "USD bills — nationwide discreet shipping" },
+  { flag: "🇪🇺", region: "European Union", detail: "Euro bills — EU & UK corridors" },
+  { flag: "🇬🇧", region: "United Kingdom", detail: "GBP bills — premium sterling notes" },
+  { flag: "🇨🇦", region: "Canada", detail: "CAD bills — fast North American delivery" },
+];
+
+function ProductGrid({ products }: { products: Product[] }) {
   if (products.length === 0) {
     return (
-      <div className="text-center py-12 bg-elite-surface/50 border border-elite-border rounded-xl">
-        <p className="text-elite-muted text-lg">{emptyLabel}</p>
+      <div className="text-center py-16 zenith-card">
+        <p className="text-elite-muted">No products listed yet. Check back soon.</p>
       </div>
     );
   }
@@ -61,26 +64,29 @@ function ProductGrid({
         <Link
           key={product._id}
           href={`/products/${product._id}`}
-          className="group bg-elite-surface border border-elite-border overflow-hidden hover:border-elite-gold transition-all duration-300"
+          className="group zenith-card overflow-hidden p-0"
         >
-          <div className="relative aspect-square overflow-hidden">
+          <div className="relative aspect-[4/3] overflow-hidden">
             {product.image && (
               <Image
                 src={product.image}
                 alt={product.title}
                 fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
             )}
-            <div className="absolute top-4 right-4 bg-elite-gold/90 text-black px-3 py-1.5 text-sm font-bold">
+            <div className="absolute top-3 right-3 bg-elite-gold text-black text-xs font-bold px-2 py-1">
               {product.currency} {product.price}
             </div>
           </div>
-          <div className="p-4">
-            <h3 className="text-white font-semibold text-sm line-clamp-2 mb-3 min-h-[2.5rem]">
+          <div className="p-5">
+            <p className="text-[10px] uppercase tracking-widest text-elite-gold mb-2">
+              {product.category}
+            </p>
+            <h3 className="text-white font-medium text-sm line-clamp-2 mb-4 min-h-[2.5rem]">
               {product.title}
             </h3>
-            <span className="w-full flex items-center justify-center gap-2 bg-elite-gold hover:bg-elite-gold-light text-black font-semibold text-xs uppercase tracking-wide py-2.5 transition-colors">
+            <span className="flex items-center justify-center gap-2 w-full py-2.5 bg-elite-gold/10 border border-elite-gold/30 text-elite-gold text-xs uppercase tracking-wider group-hover:bg-elite-gold group-hover:text-black transition-colors">
               <ShoppingCart className="w-4 h-4" />
               Shop Now
             </span>
@@ -91,178 +97,199 @@ function ProductGrid({
   );
 }
 
-function ProductSectionHeader({
-  title,
-  count,
-  total,
-}: {
-  title: string;
-  count: number;
-  total: number;
-}) {
-  return (
-    <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-8">
-      <h2 className="font-display text-2xl md:text-3xl font-bold text-white">
-        {title}
-      </h2>
-      <p className="text-elite-muted text-sm">
-        Showing 1-{count} of {total} bills
-      </p>
-    </div>
-  );
-}
-
 export default function HomePage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  // const [cloneProducts, setCloneProducts] = useState<Product[]>([]);
-  const [billProducts, setBillProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const res = await fetch("/api/addProduct");
-        if (!res.ok) return;
-        const data: Product[] = await res.json();
-        // setCloneProducts(
-        //   data.filter((p) => p.category?.toLowerCase() === "clone cards")
-        // );
-        setBillProducts(
+    fetch("/api/addProduct")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: Product[]) =>
+        setProducts(
           data.filter((p) =>
-            BILL_CATEGORIES.includes(p.category?.toUpperCase() ?? "")
+            SHOP_CATEGORIES.some(
+              (cat) => cat.toLowerCase() === p.category?.toLowerCase()
+            )
           )
-        );
-      } catch {
-        // Homepage still renders if API is unavailable
-      }
-    };
-    loadProducts();
+        )
+      )
+      .catch(() => {});
   }, []);
 
-  // const featuredClones = cloneProducts.slice(0, 4);
-  const featuredBills = billProducts.slice(0, 4);
+  const featured = products.slice(0, 4);
 
   return (
     <div className="min-h-screen bg-elite-bg">
-      <div className="fixed top-0 left-0 w-full z-50">
-        <Navbar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-      </div>
+      <Navbar variant="hero" />
 
       {/* Hero */}
-      <section className="relative min-h-[85vh] flex items-center justify-center pt-32 pb-16">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/dollarbill.jpeg"
-            alt="Elite Notes — Premium Bills"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-black/70" />
-          <div className="absolute inset-0 bg-gradient-to-t from-elite-bg via-black/40 to-black/50" />
-        </div>
+      <section className="relative min-h-screen flex items-center justify-center pt-24 md:pt-28 pb-24">
+        <HeroSlider />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white uppercase leading-tight mb-6">
-            Buy Undetectable Counterfeit Bills Online from{" "}
-            <span className="text-elite-gold">Elite Notes</span>
-          </h1>
-          <p className="text-base md:text-lg text-white/85 max-w-3xl mx-auto mb-10 leading-relaxed">
-            Our premium bills are crafted to pass standard checks and look
-            genuine in hand. Available in USD, EUR, GBP, and CAD with discreet
-            worldwide shipping and 100% confidential packaging.
+        <div className="relative z-10 zenith-container text-center max-w-4xl px-4">
+          <p className="section-eyebrow mb-10 md:mb-12">
+            Your Vision. Our Network. Your Success.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/bills"
-              className="btn-primary px-10 py-3.5 text-sm w-full sm:w-auto text-center"
-            >
-              Shop Bills
+
+          <h1 className="hero-title mb-10 md:mb-12">
+            <span className="block text-white">Where Capital</span>
+            <span className="block text-elite-gold">Meets Ambition</span>
+          </h1>
+
+          <div className="inline-block bg-black/55 backdrop-blur-[2px] border border-white/10 px-8 sm:px-12 py-6 mb-12 max-w-2xl mx-auto">
+            <p className="hero-body">
+              Elite Notes — premium currency solutions and discreet worldwide
+              delivery, trusted since 2018.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5">
+            <Link href="/bills" className="btn-primary w-full sm:w-auto min-w-[220px]">
+              Start Shopping
             </Link>
-            <Link
-              href="/reviews"
-              className="btn-secondary px-10 py-3.5 text-sm w-full sm:w-auto text-center"
-            >
-              Reviews
+            <Link href="/ascorbicacid" className="btn-secondary w-full sm:w-auto min-w-[220px]">
+              Explore Catalog
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-14 px-6 bg-elite-surface/40 border-y border-elite-border">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map(({ icon: Icon, title, description }) => (
-            <div
-              key={title}
-              className="text-center p-6 border border-elite-border bg-elite-bg/60"
-            >
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-elite-gold/10 mb-4">
-                <Icon className="w-5 h-5 text-elite-gold" />
+      {/* Stats */}
+      <section className="border-y border-white/10 bg-elite-surface/30">
+        <div className="zenith-container py-14">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {stats.map((stat) => (
+              <CountUpStat
+                key={stat.label}
+                value={stat.value}
+                suffix={stat.suffix}
+                label={stat.label}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* What We Do */}
+      <section className="zenith-section">
+        <div className="zenith-container">
+          <SectionHeading
+            eyebrow="What We Do"
+            title="Strategic Currency"
+            highlight="Solutions"
+            subtitle="We don't just supply products — we deliver discreet, premium-grade currency and chemical solutions trusted by clients worldwide."
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {services.map((service) => (
+              <div key={service.title} className="zenith-card">
+                <h3 className="font-display text-xl text-white mb-3">
+                  {service.title}
+                </h3>
+                <p className="text-elite-muted text-sm leading-relaxed">
+                  {service.description}
+                </p>
               </div>
-              <h3 className="font-display text-lg font-semibold text-white mb-2">
-                {title}
-              </h3>
-              <p className="text-elite-muted text-sm">{description}</p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Our Reach */}
+      <section className="zenith-section bg-elite-surface/20 border-y border-white/5">
+        <div className="zenith-container">
+          <SectionHeading
+            eyebrow="Our Reach"
+            title="Active in the World's"
+            highlight="Key Markets"
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {markets.map((market) => (
+              <div key={market.region} className="zenith-card text-center">
+                <span className="text-3xl mb-4 block">{market.flag}</span>
+                <h4 className="font-display text-lg text-white mb-2">
+                  {market.region}
+                </h4>
+                <p className="text-elite-muted text-sm">{market.detail}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Products */}
+      <section className="zenith-section">
+        <div className="zenith-container">
+          <SectionHeading
+            eyebrow="Featured"
+            title="Premium"
+            highlight="Products"
+            subtitle="Browse our latest bills and ascorbic acid listings."
+          />
+          <ProductGrid products={featured} />
+          {products.length > 4 && (
+            <div className="text-center mt-10">
+              <Link href="/bills" className="btn-ghost-gold inline-flex gap-2">
+                View All Products
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
-          ))}
+          )}
         </div>
       </section>
 
-      {/* Featured Bills */}
-      <section className="py-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          <ProductSectionHeader
-            title="Featured Bills"
-            count={featuredBills.length}
-            total={billProducts.length}
+      {/* Who We Are */}
+      <section className="zenith-section bg-elite-surface/20 border-y border-white/5">
+        <div className="zenith-container">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <SectionHeading
+                eyebrow="Who We Are"
+                title="Built on Trust,"
+                highlight="Driven by Quality"
+                align="left"
+              />
+              <p className="text-elite-muted leading-relaxed mb-6">
+                Elite Notes was founded on a singular conviction: that premium
+                currency solutions demand more than a transaction — they demand
+                discretion, consistency, and a partner you can rely on.
+              </p>
+              <p className="text-elite-muted leading-relaxed mb-8">
+                With a global footprint and deep expertise across multiple
+                currencies, our team delivers quality where it matters most.
+              </p>
+              <Link href="/bills" className="btn-primary">
+                Shop With Us
+              </Link>
+            </div>
+            <blockquote className="zenith-card border-l-4 border-l-elite-gold">
+              <p className="font-display text-xl md:text-2xl text-white/90 italic leading-relaxed mb-6">
+                &ldquo;We don&apos;t just supply currency. We supply confidence
+                in every order.&rdquo;
+              </p>
+              <footer className="text-elite-gold text-sm tracking-widest uppercase">
+                — Elite Notes
+              </footer>
+            </blockquote>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="zenith-section">
+        <div className="zenith-container max-w-3xl text-center">
+          <SectionHeading
+            eyebrow="Get Started"
+            title="Ready to"
+            highlight="Order?"
+            subtitle="Browse our full catalog of premium bills and ascorbic acid products — discreet shipping worldwide."
           />
-          <ProductGrid products={featuredBills} emptyLabel="No bills found" />
-        </div>
-      </section>
-
-      {/* Buy Bills */}
-      <section className="py-12 px-6 bg-elite-surface/30 border-y border-elite-border">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-display text-2xl md:text-3xl font-bold text-elite-gold uppercase mb-6">
-            Buy Counterfeit Bills Online
-          </h2>
-          <p className="text-white/80 leading-relaxed">
-            Looking for high-quality bills for sale? We offer undetectable
-            counterfeit bills in USD, Euro, GBP, and CAD — premium quality with
-            discrete packing and fast international shipping.
-          </p>
-        </div>
-      </section>
-
-      {/* Cloned cards section — disabled
-      <section className="py-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          <ProductSectionHeader
-            title="Other Products"
-            count={featuredClones.length}
-            total={cloneProducts.length}
-          />
-          <ProductGrid products={featuredClones} emptyLabel="No card products found" />
-        </div>
-      </section>
-      */}
-
-      {/* View All Bills CTA */}
-      <section className="py-16 px-6 bg-elite-surface/30 border-t border-elite-border">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-display text-2xl md:text-3xl font-bold text-elite-gold uppercase mb-6">
-            Shop All Bill Currencies
-          </h2>
-          <p className="text-white/80 leading-relaxed mb-8">
-            Browse USD, Euro, GBP, and CAD bills — 24/7 ordering available.
-          </p>
-          <Link
-            href="/bills"
-            className="btn-primary inline-flex items-center gap-2 px-8 py-3 text-sm"
-          >
-            View All Bills
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/bills" className="btn-primary">
+              Browse Bills
+            </Link>
+            <Link href="/reviews" className="btn-secondary">
+              Read Reviews
+            </Link>
+          </div>
         </div>
       </section>
 

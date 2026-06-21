@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 :root {
-  --background: #0a0a0f;
+  --background: #08080d;
   --foreground: #ffffff;
   --elite-gold: #c5a059;
   --elite-gold-light: #d4b36a;
@@ -13,7 +13,6 @@
 }
 
 * {
-  font-family: var(--font-montserrat), system-ui, sans-serif;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -34,31 +33,74 @@ h1,
 h2,
 h3,
 .font-display {
-  font-family: var(--font-playfair), Georgia, serif;
+  font-family: var(--font-cormorant), Georgia, serif;
 }
 
 @layer components {
-  .text-brand {
-    @apply text-elite-gold;
+  .section-eyebrow {
+    @apply font-sans text-[11px] md:text-xs font-medium tracking-[0.4em] uppercase text-elite-gold;
   }
 
-  .text-brand-gradient {
-    @apply bg-gradient-to-r from-elite-gold via-elite-gold-light to-elite-gold bg-clip-text text-transparent;
+  .hero-title {
+    @apply font-display font-light italic text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] leading-[1.12] tracking-tight;
+    font-family: var(--font-cormorant), Georgia, serif;
+  }
+
+  .hero-title * {
+    font-family: inherit;
+    font-style: inherit;
+    font-weight: inherit;
+  }
+
+  .hero-body {
+    @apply font-display font-light italic text-base sm:text-lg md:text-xl text-white/90 leading-relaxed;
+  }
+
+  .zenith-container {
+    @apply max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10;
+  }
+
+  .zenith-section {
+    @apply py-20 md:py-28;
+  }
+
+  .zenith-card {
+    @apply bg-elite-surface/40 border border-elite-border/80 p-8 transition-all duration-300 hover:border-elite-gold/50 hover:bg-elite-surface/60;
+  }
+
+  .zenith-stat-value {
+    @apply font-display font-light italic text-4xl md:text-5xl text-elite-gold;
+  }
+
+  .zenith-stat-label {
+    @apply mt-2 font-sans text-xs text-elite-muted uppercase tracking-[0.2em];
   }
 
   .btn-primary {
-    @apply bg-elite-gold text-black font-sans font-semibold uppercase tracking-[0.15em] rounded-sm hover:bg-elite-gold-light transition-colors duration-300;
+    @apply inline-flex items-center justify-center bg-elite-gold text-black font-sans font-medium uppercase tracking-[0.22em] text-[11px] md:text-xs px-8 py-3.5 hover:bg-elite-gold-light transition-colors duration-300;
   }
 
   .btn-secondary {
-    @apply border border-white text-white font-sans font-semibold uppercase tracking-[0.15em] rounded-sm bg-transparent hover:border-elite-gold hover:text-elite-gold transition-colors duration-300;
+    @apply inline-flex items-center justify-center border border-white/50 text-white font-sans font-medium uppercase tracking-[0.22em] text-[11px] md:text-xs px-8 py-3.5 bg-black/20 backdrop-blur-sm hover:border-elite-gold hover:text-elite-gold transition-colors duration-300;
+  }
+
+  .btn-ghost-gold {
+    @apply inline-flex items-center justify-center border border-elite-gold/60 text-elite-gold font-sans font-medium uppercase tracking-[0.18em] text-[11px] px-6 py-3 hover:bg-elite-gold hover:text-black transition-colors duration-300;
   }
 
   .input-elite {
-    @apply bg-elite-card/50 border border-elite-border text-gray-100 placeholder-elite-muted focus:outline-none focus:ring-2 focus:ring-elite-gold focus:border-transparent;
+    @apply w-full bg-black/40 border border-elite-border text-gray-100 placeholder-elite-muted px-4 py-3 focus:outline-none focus:ring-1 focus:ring-elite-gold focus:border-elite-gold;
   }
 
-  .card-elite {
-    @apply bg-elite-surface border border-elite-border rounded-lg;
+  .utility-link {
+    @apply font-sans text-[10px] md:text-[11px] font-medium uppercase tracking-[0.22em] text-elite-gold hover:text-elite-gold-light transition-colors;
+  }
+
+  .nav-link {
+    @apply relative font-sans text-[10px] md:text-[11px] font-medium uppercase tracking-[0.18em] text-white/85 hover:text-elite-gold transition-colors pb-1;
+  }
+
+  .nav-link-active {
+    @apply text-elite-gold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-elite-gold;
   }
 }
