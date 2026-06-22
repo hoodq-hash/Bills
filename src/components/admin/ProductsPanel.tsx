@@ -2,19 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import {
-  Package,
-  Pencil,
-  Trash2,
-  Tag,
-  Upload,
-  FileText,
-  DollarSign,
-  Save,
-} from "lucide-react";
+import { Package, Pencil, Trash2, Upload, Save, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import type { Product, ProductFormData } from "@/types";
 import { ADMIN_CATEGORIES } from "@/constants/catalog";
+import { AdminEmpty } from "./AdminUI";
+import ProductPreview from "./ProductPreview";
 
 const CATEGORIES = [...ADMIN_CATEGORIES];
 
@@ -34,6 +27,7 @@ interface ProductsPanelProps {
   mode: "list" | "form";
   editingProduct: Product | null;
   onEdit: (product: Product) => void;
+  onAdd?: () => void;
   onCancelEdit: () => void;
   onSaved: () => void;
 }
@@ -42,12 +36,14 @@ export default function ProductsPanel({
   mode,
   editingProduct,
   onEdit,
+  onAdd,
   onCancelEdit,
   onSaved,
 }: ProductsPanelProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [form, setForm] = useState<ProductFormData>(emptyForm);
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const fetchProducts = async () => {
     const res = await fetch("/api/products");
@@ -83,17 +79,49 @@ export default function ProductsPanel({
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     if (file.size > 5 * 1024 * 1024) {
       toast.error("Image must be under 5MB");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () =>
-      setForm((prev) => ({ ...prev, image: reader.result as string }));
-    reader.readAsDataURL(file);
+
+    const localPreview = URL.createObjectURL(file);
+    setForm((prev) => ({ ...prev, image: localPreview }));
+    setUploadingImage(true);
+
+    try {
+      const body = new FormData();
+      body.append("file", file);
+
+      const res = await fetch("/api/upload", { method: "POST", body });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Upload failed");
+      }
+
+      URL.revokeObjectURL(localPreview);
+      setForm((prev) => ({ ...prev, image: data.url }));
+      toast.success("Image uploaded to Cloudinary");
+    } catch (err) {
+      URL.revokeObjectURL(localPreview);
+      setForm((prev) => ({
+        ...prev,
+        image: editingProduct?.image || null,
+      }));
+      toast.error(err instanceof Error ? err.message : "Image upload failed");
+    } finally {
+      setUploadingImage(false);
+      e.target.value = "";
+    }
+  };
+
+  const removeImage = () => {
+    if (form.image?.startsWith("blob:")) URL.revokeObjectURL(form.image);
+    setForm((prev) => ({ ...prev, image: null }));
   };
 
   const validate = () => {
@@ -105,6 +133,7 @@ export default function ProductsPanel({
     if (!form.currency) return toast.error("Currency is required"), false;
     if (!form.mog) return toast.error("MOQ is required"), false;
     if (!form.bills_quantity) return toast.error("Bills quantity is required"), false;
+    if (uploadingImage) return toast.error("Wait for image upload to finish"), false;
     return true;
   };
 
@@ -115,207 +144,285 @@ export default function ProductsPanel({
     try {
       const url = editingProduct
         ? `/api/products/${editingProduct._id}`
-        : "/api/addProduct";
+        : "/api/products";
       const res = await fetch(url, {
         method: editingProduct ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
       if (res.ok) {
-        toast.success(editingProduct ? "Bill updated" : "Bill created");
+        toast.success(editingProduct ? "Product updated" : "Product created");
         setForm(emptyForm);
         onSaved();
       } else {
         const data = await res.json();
-        toast.error(data.message || "Failed to save bill");
+        toast.error(data.message || "Failed to save product");
       }
     } catch {
-      toast.error("Error saving bill");
+      toast.error("Error saving product");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this bill?")) return;
+    if (!confirm("Delete this product?")) return;
     const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
     if (res.ok) {
-      toast.success("Bill deleted");
+      toast.success("Product deleted");
       fetchProducts();
+    } else {
+      toast.error("Failed to delete product");
     }
   };
 
   if (mode === "list") {
     return (
-      <div className="bg-elite-surface border border-elite-border rounded-xl p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
-            <div
-              key={product._id}
-              className="bg-elite-bg rounded-lg border border-elite-border overflow-hidden"
-            >
-              {product.image && (
-                <div className="relative h-48 w-full">
-                  <Image src={product.image} alt={product.title} fill className="object-cover" />
-                </div>
-              )}
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-white mb-2">{product.title}</h3>
-                <div className="space-y-1 text-sm text-slate-300">
-                  <p className="line-clamp-2">{product.description}</p>
-                  <p className="text-elite-gold font-semibold">
-                    {product.currency} {product.price}
+      <div>
+        {onAdd && (
+          <div className="flex justify-end mb-6">
+            <button type="button" onClick={onAdd} className="btn-primary gap-2">
+              <Package className="w-3.5 h-3.5" />
+              Add Product
+            </button>
+          </div>
+        )}
+
+        {products.length === 0 ? (
+          <div className="admin-card">
+            <AdminEmpty message="No products in catalog yet" />
+            {onAdd && (
+              <div className="flex justify-center pb-10">
+                <button type="button" onClick={onAdd} className="btn-primary gap-2">
+                  <Package className="w-3.5 h-3.5" />
+                  Add Your First Product
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {products.map((product) => (
+              <div key={product._id} className="admin-card overflow-hidden group">
+                {product.image && (
+                  <div className="relative h-48 w-full overflow-hidden">
+                    <Image
+                      src={product.image}
+                      alt={product.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute top-3 right-3 bg-elite-gold text-black font-sans text-[10px] uppercase tracking-wider px-2 py-1">
+                      {product.currency} {product.price}
+                    </div>
+                  </div>
+                )}
+                <div className="p-5">
+                  <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-elite-gold mb-2">
+                    {product.category}
                   </p>
-                  <p>Category: {product.category}</p>
-                </div>
-                <div className="mt-4 flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onEdit(product)}
-                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-elite-gold text-black rounded-lg text-sm"
-                  >
-                    <Pencil className="w-4 h-4" />
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(product._id)}
-                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-red-600 text-white rounded-lg text-sm"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Delete
-                  </button>
+                  <h3 className="font-display font-light italic text-lg text-white mb-2">
+                    {product.title}
+                  </h3>
+                  <p className="text-sm text-elite-muted line-clamp-2 mb-5">
+                    {product.description}
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onEdit(product)}
+                      className="btn-primary flex-1 gap-2 py-2.5"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(product._id)}
+                      className="btn-secondary px-4 py-2.5 text-red-400/80 border-red-500/30 hover:border-red-400 hover:text-red-400"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-        {products.length === 0 && (
-          <div className="text-center text-slate-400 py-12">
-            <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>No bills found</p>
+            ))}
           </div>
         )}
       </div>
     );
   }
 
+  const fieldClass = "input-elite text-sm mt-2";
+  const labelClass =
+    "font-sans text-[10px] uppercase tracking-[0.2em] text-elite-muted block";
+
   return (
-    <div className="bg-elite-surface border border-elite-border rounded-xl p-6">
-      <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
-        <div>
-          <label className="flex items-center text-sm text-gray-300 mb-1">
-            <Tag className="mr-2 h-4 w-4" />
-            Bill name*
-          </label>
-          <input
-            type="text"
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            className="w-full px-3 py-2 bg-elite-bg/50 border border-elite-border text-white rounded-lg"
-            placeholder="Enter bill name"
-          />
-        </div>
-
-        <div>
-          <label className="flex items-center text-sm text-gray-300 mb-1">
-            <Upload className="mr-2 h-4 w-4" />
-            Bill Image
-          </label>
-          <label className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-elite-border rounded-lg cursor-pointer hover:border-elite-gold bg-elite-bg/30">
-            {form.image ? (
-              <div className="relative w-full h-full">
-                <Image src={form.image} alt="Preview" fill className="object-contain p-2" />
-              </div>
-            ) : (
-              <div className="text-center text-slate-400">
-                <Upload className="mx-auto h-10 w-10 mb-2" />
-                <p className="text-sm">Click to upload (max 5MB)</p>
-              </div>
-            )}
-            <input type="file" className="hidden" onChange={handleImage} accept="image/*" />
-          </label>
-        </div>
-
-        <div>
-          <label className="flex items-center text-sm text-gray-300 mb-1">
-            <FileText className="mr-2 h-4 w-4" />
-            Description*
-          </label>
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            rows={4}
-            className="w-full px-3 py-2 bg-elite-bg/50 border border-elite-border text-white rounded-lg"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
+      {/* Form — left */}
+      <div className="admin-card p-6 md:p-8">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="flex items-center text-sm text-gray-300 mb-1">
-              <DollarSign className="mr-2 h-4 w-4" />
-              Price*
+            <label htmlFor="title" className={labelClass}>
+              Product Name *
             </label>
             <input
-              type="number"
-              name="price"
-              value={form.price}
+              id="title"
+              type="text"
+              name="title"
+              value={form.title}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-elite-bg/50 border border-elite-border text-white rounded-lg"
+              className={fieldClass}
+              placeholder="Enter product name"
             />
           </div>
+
           <div>
-            <label className="text-sm text-gray-300 mb-1 block">Category*</label>
-            <select
-              name="category"
-              value={form.category}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-elite-bg/50 border border-elite-border text-white rounded-lg"
-            >
-              <option value="">Select category</option>
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
+            <label className={labelClass}>Product Image</label>
+            <div className="relative mt-2">
+              <label className="flex flex-col items-center justify-center h-44 border border-dashed border-elite-border cursor-pointer hover:border-elite-gold/50 bg-black/20 transition-colors">
+                {form.image ? (
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={form.image}
+                      alt="Preview"
+                      fill
+                      className="object-contain p-2"
+                      unoptimized={form.image.startsWith("blob:")}
+                    />
+                    {uploadingImage && (
+                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                        <Loader2 className="w-6 h-6 text-elite-gold animate-spin" />
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center text-elite-muted py-8">
+                    <Upload className="mx-auto h-8 w-8 mb-2 opacity-50" />
+                    <p className="font-sans text-xs uppercase tracking-wider">
+                      Upload to Cloudinary
+                    </p>
+                    <p className="font-sans text-[10px] text-elite-muted/70 mt-1">
+                      JPG, PNG — max 5MB
+                    </p>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                  accept="image/*"
+                  disabled={uploadingImage}
+                />
+              </label>
+              {form.image && !uploadingImage && (
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="absolute top-2 right-2 p-1.5 bg-black/70 text-white/70 hover:text-white transition-colors"
+                  aria-label="Remove image"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            {form.image?.includes("cloudinary") && (
+              <p className="font-sans text-[10px] text-emerald-400/80 mt-2 uppercase tracking-wider">
+                Stored on Cloudinary
+              </p>
+            )}
           </div>
-          {(["currency", "design", "mog", "bills_quantity"] as const).map((field) => (
-            <div key={field}>
-              <label className="text-sm text-gray-300 mb-1 block capitalize">
-                {field.replace("_", " ")}*
+
+          <div>
+            <label htmlFor="description" className={labelClass}>
+              Description *
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              rows={4}
+              className={fieldClass}
+              placeholder="Product description..."
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label htmlFor="price" className={labelClass}>
+                Price *
               </label>
               <input
-                type="text"
-                name={field}
-                value={form[field]}
+                id="price"
+                type="number"
+                name="price"
+                value={form.price}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-elite-bg/50 border border-elite-border text-white rounded-lg"
+                className={fieldClass}
+                placeholder="0.00"
               />
             </div>
-          ))}
-        </div>
+            <div>
+              <label htmlFor="category" className={labelClass}>
+                Category *
+              </label>
+              <select
+                id="category"
+                name="category"
+                value={form.category}
+                onChange={handleChange}
+                className={`${fieldClass} admin-select`}
+              >
+                <option value="">Select category</option>
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {(["currency", "design", "mog", "bills_quantity"] as const).map((field) => (
+              <div key={field}>
+                <label htmlFor={field} className={labelClass}>
+                  {field === "mog" ? "MOQ" : field.replace("_", " ")} *
+                </label>
+                <input
+                  id={field}
+                  type="text"
+                  name={field}
+                  value={form[field]}
+                  onChange={handleChange}
+                  className={fieldClass}
+                />
+              </div>
+            ))}
+          </div>
 
-        <div className="flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={onCancelEdit}
-            className="px-4 py-2 bg-gray-300 text-black rounded-lg"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-elite-gold text-black rounded-lg disabled:opacity-50"
-          >
-            <Save className="w-4 h-4" />
-            {loading ? "Saving..." : editingProduct ? "Update Bill" : "Save Bill"}
-          </button>
-        </div>
-      </form>
+          <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+            <button type="button" onClick={onCancelEdit} className="btn-secondary py-3 px-6">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading || uploadingImage}
+              className="btn-primary gap-2 py-3 px-6 disabled:opacity-50"
+            >
+              <Save className="w-3.5 h-3.5" />
+              {loading
+                ? "Saving..."
+                : editingProduct
+                  ? "Update Product"
+                  : "Create Product"}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Preview — right */}
+      <aside className="xl:sticky xl:top-24">
+        <ProductPreview form={form} />
+      </aside>
     </div>
   );
 }

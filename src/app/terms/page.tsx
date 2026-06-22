@@ -1,7 +1,7 @@
-"use client";
 import Link from "next/link";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
+import { SITE_EMAIL, SITE_PHONE_DISPLAY } from "@/constants/site";
 
 export default function TermsAndConditions() {
   return (
@@ -75,8 +75,7 @@ export default function TermsAndConditions() {
             },
             {
               title: "11. Contact Information:",
-              content:
-                "For questions or concerns about these Terms, please contact our customer support as listed on our website.",
+              content: `For questions or concerns about these Terms, contact us at ${SITE_PHONE_DISPLAY} or ${SITE_EMAIL}.`,
             },
           ].map((section, index) => (
             <section

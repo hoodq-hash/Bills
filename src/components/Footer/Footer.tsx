@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SITE_EMAIL, SITE_PHONE, SITE_PHONE_DISPLAY } from "@/constants/site";
 
 const footerLinks = {
   company: [
@@ -78,16 +79,22 @@ export default function Footer() {
               Contact
             </h3>
             <ul className="space-y-3 text-sm text-elite-muted">
-              <li>Los Angeles, California</li>
               <li>
                 <a
-                  href="mailto:info@elitenotes.com"
+                  href={`mailto:${SITE_EMAIL}`}
                   className="hover:text-elite-gold transition-colors"
                 >
-                  info@elitenotes.com
+                  {SITE_EMAIL}
                 </a>
               </li>
-              <li>+1 (443) 312-9778</li>
+              <li>
+                <a
+                  href={`tel:${SITE_PHONE}`}
+                  className="hover:text-elite-gold transition-colors"
+                >
+                  {SITE_PHONE_DISPLAY}
+                </a>
+              </li>
             </ul>
             <ul className="mt-6 space-y-3">
               {footerLinks.legal.map((link) => (

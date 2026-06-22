@@ -4,19 +4,12 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const SLIDES = [
- 
-  {
-    src: "/images/dollarbill.jpeg",
-    label: "Dubai · UAE",
-  },
+  { src: "/images/dollarbill.jpeg", alt: "USD currency" },
   {
     src: "/images/100-euros-banknote-first-series-obverse-1.jpg",
-    label: "Frankfurt · Europe",
+    alt: "Euro currency",
   },
-  {
-    src: "/images/50-gbp-new1-247x185.jpg",
-    label: "London · United Kingdom",
-  },
+  { src: "/images/50-gbp-new1-247x185.jpg", alt: "GBP currency" },
 ];
 
 export default function HeroSlider() {
@@ -40,7 +33,7 @@ export default function HeroSlider() {
         >
           <Image
             src={slide.src}
-            alt={slide.label}
+            alt={slide.alt}
             fill
             className="object-cover"
             priority={i === 0}
@@ -49,7 +42,6 @@ export default function HeroSlider() {
       ))}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-elite-bg" />
 
-      {/* Slide indicators — center bottom */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3">
         {SLIDES.map((_, i) => (
           <button
@@ -62,13 +54,6 @@ export default function HeroSlider() {
             }`}
           />
         ))}
-      </div>
-
-      {/* Location label — bottom right */}
-      <div className="absolute bottom-10 right-6 md:right-10 z-10">
-        <span className="font-sans text-[10px] md:text-[11px] tracking-[0.28em] uppercase text-elite-gold/90">
-          {SLIDES[index].label}
-        </span>
       </div>
     </div>
   );

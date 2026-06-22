@@ -3,13 +3,18 @@
 import { useEffect, useState } from "react";
 import { Printer, Download, Search } from "lucide-react";
 import type { Order } from "@/types";
+import { AdminLoading, AdminEmpty } from "./AdminUI";
 
 function ReceiptContent({ order }: { order: Order }) {
   return (
     <div className="bg-white text-black p-8 max-w-lg mx-auto font-sans text-sm">
       <div className="text-center border-b border-gray-300 pb-4 mb-4">
-        <h1 className="text-2xl font-bold tracking-wide">ELITE NOTES</h1>
-        <p className="text-gray-500 text-xs mt-1">Official Receipt</p>
+        <h1 className="font-display text-2xl font-light italic tracking-wide">
+          Elite Notes
+        </h1>
+        <p className="text-gray-500 text-xs mt-1 uppercase tracking-widest">
+          Official Receipt
+        </p>
       </div>
       <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
         <div>
@@ -77,7 +82,9 @@ function ReceiptContent({ order }: { order: Order }) {
         </div>
       </div>
       <div className="mt-4 pt-4 border-t border-gray-300 text-xs text-gray-500">
-        <p>Payment: {order.paymentMethod} — {order.paymentStatus}</p>
+        <p>
+          Payment: {order.paymentMethod} — {order.paymentStatus}
+        </p>
         <p>Order status: {order.status}</p>
       </div>
       <p className="text-center text-xs text-gray-400 mt-6">
@@ -117,13 +124,7 @@ export default function ReceiptsPanel() {
     }, 300);
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-elite-gold" />
-      </div>
-    );
-  }
+  if (loading) return <AdminLoading />;
 
   return (
     <>
@@ -133,64 +134,63 @@ export default function ReceiptsPanel() {
         </div>
       )}
 
-      <div className="space-y-4 pb-20 md:pb-0">
+      <div className="space-y-6 pb-20 md:pb-0">
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-elite-muted" />
           <input
             type="text"
-            placeholder="Search by order #, name or email..."
+            placeholder="Search order #, name or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-elite-surface border border-elite-border text-white rounded-lg text-sm focus:ring-2 focus:ring-elite-gold"
+            className="input-elite pl-11 text-sm"
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.length === 0 ? (
-            <p className="text-slate-400 col-span-full text-center py-16">
-              No receipts found
-            </p>
+            <div className="col-span-full">
+              <AdminEmpty message="No receipts found" />
+            </div>
           ) : (
             filtered.map((order) => (
-              <div
-                key={order._id}
-                className="bg-elite-surface border border-elite-border rounded-xl p-5"
-              >
-                <div className="flex justify-between items-start mb-3">
+              <div key={order._id} className="admin-card p-5 flex flex-col">
+                <div className="flex justify-between items-start mb-4">
                   <div>
-                    <p className="font-mono text-elite-gold text-sm">
+                    <p className="font-mono text-elite-gold text-xs">
                       {order.receiptNumber}
                     </p>
-                    <p className="text-white font-medium mt-1">
+                    <p className="font-display font-light italic text-lg text-white mt-2">
                       {order.customer.firstName} {order.customer.lastName}
                     </p>
-                    <p className="text-xs text-slate-500">{order.customer.email}</p>
+                    <p className="text-xs text-elite-muted mt-1">
+                      {order.customer.email}
+                    </p>
                   </div>
-                  <p className="text-lg font-bold text-white">
+                  <p className="font-display font-light italic text-xl text-elite-gold">
                     ${order.total.toFixed(2)}
                   </p>
                 </div>
-                <p className="text-xs text-slate-500 mb-4">
+                <p className="text-[10px] uppercase tracking-[0.15em] text-elite-muted mb-5">
                   {order.createdAt
                     ? new Date(order.createdAt).toLocaleDateString()
                     : "—"}{" "}
                   · {order.items.length} item(s) · {order.paymentStatus}
                 </p>
-                <div className="flex gap-2">
+                <div className="flex gap-2 mt-auto">
                   <button
                     type="button"
                     onClick={() => handlePrint(order)}
-                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-elite-gold text-black rounded-lg text-sm font-medium hover:bg-elite-gold-light"
+                    className="btn-primary flex-1 gap-2 py-3"
                   >
-                    <Printer className="w-4 h-4" />
+                    <Printer className="w-3.5 h-3.5" />
                     Print
                   </button>
                   <button
                     type="button"
                     onClick={() => setPrintOrder(order)}
-                    className="flex items-center justify-center px-3 py-2 border border-elite-border text-slate-300 rounded-lg hover:border-elite-gold"
+                    className="btn-secondary px-4 py-3"
                   >
-                    <Download className="w-4 h-4" />
+                    <Download className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -199,22 +199,24 @@ export default function ReceiptsPanel() {
         </div>
 
         {printOrder && (
-          <div className="print:hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl overflow-hidden max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center p-4 border-b bg-elite-surface">
-                <p className="text-white font-medium">Receipt Preview</p>
+          <div className="print:hidden fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+            <div className="bg-white overflow-hidden max-h-[90vh] overflow-y-auto max-w-lg w-full">
+              <div className="flex justify-between items-center p-4 border-b border-white/10 bg-elite-bg">
+                <p className="font-display font-light italic text-white">
+                  Receipt Preview
+                </p>
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => handlePrint(printOrder)}
-                    className="px-4 py-2 bg-elite-gold text-black rounded-lg text-sm"
+                    className="btn-primary py-2.5 px-5"
                   >
                     Print
                   </button>
                   <button
                     type="button"
                     onClick={() => setPrintOrder(null)}
-                    className="px-4 py-2 border border-elite-border text-slate-300 rounded-lg text-sm"
+                    className="btn-secondary py-2.5 px-5"
                   >
                     Close
                   </button>

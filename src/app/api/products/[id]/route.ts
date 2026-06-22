@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
 import dbConnect from "@/utils/dbConnect";
 import Product from "@/models/Product";
+import { uploadToCloudinary, deleteFromCloudinary } from "@/utils/cloudinary";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -39,16 +39,10 @@ export const PUT = async (req: NextRequest, { params }: RouteContext) => {
 
     await dbConnect();
 
-    cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET,
-    });
-
     let imageUrl = image as string;
     if (image && typeof image === "string" && image.startsWith("data:image")) {
-      const uploadResult = await cloudinary.uploader.upload(image, {
-        public_id: `${title}-${Date.now()}`,
+      const uploadResult = await uploadToCloudinary(image, {
+        publicId: `${title}-${Date.now()}`.replace(/\W+/g, "-"),
       });
       imageUrl = uploadResult.secure_url;
     }
@@ -90,17 +84,8 @@ export const DELETE = async (_req: NextRequest, { params }: RouteContext) => {
       return NextResponse.json({ message: "Product not found" }, { status: 404 });
     }
 
-    if (product.image && product.image.includes("cloudinary")) {
-      cloudinary.config({
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-        api_key: process.env.CLOUDINARY_API_KEY,
-        api_secret: process.env.CLOUDINARY_API_SECRET,
-      });
-
-      const publicId = product.image.split("/").pop()?.split(".")[0];
-      if (publicId) {
-        await cloudinary.uploader.destroy(publicId);
-      }
+    if (product.image) {
+      await deleteFromCloudinary(product.image);
     }
 
     return NextResponse.json({ message: "Product deleted successfully" });

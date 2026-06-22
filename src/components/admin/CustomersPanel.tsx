@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Mail, Phone, ShoppingBag } from "lucide-react";
 import type { Order } from "@/types";
+import { AdminLoading, AdminEmpty } from "./AdminUI";
 
 interface CustomerSummary {
   email: string;
@@ -45,68 +46,61 @@ export default function CustomersPanel() {
         });
 
         setCustomers(
-          Array.from(map.values()).sort(
-            (a, b) => b.totalSpent - a.totalSpent
-          )
+          Array.from(map.values()).sort((a, b) => b.totalSpent - a.totalSpent)
         );
       })
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-elite-gold" />
-      </div>
-    );
-  }
+  if (loading) return <AdminLoading />;
 
   return (
     <div className="pb-20 md:pb-0">
-      <div className="bg-elite-surface border border-elite-border rounded-xl overflow-hidden">
+      <div className="admin-card overflow-hidden">
         {customers.length === 0 ? (
-          <p className="text-slate-400 text-center py-16">No customers yet</p>
+          <AdminEmpty message="No customers yet" />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-elite-bg/50 text-slate-400">
+            <table className="admin-table">
+              <thead>
                 <tr>
-                  <th className="text-left px-6 py-3">Customer</th>
-                  <th className="text-left px-6 py-3">Contact</th>
-                  <th className="text-left px-6 py-3">Orders</th>
-                  <th className="text-left px-6 py-3">Total Spent</th>
-                  <th className="text-left px-6 py-3">Last Order</th>
+                  <th>Customer</th>
+                  <th>Contact</th>
+                  <th>Orders</th>
+                  <th>Total Spent</th>
+                  <th>Last Order</th>
                 </tr>
               </thead>
               <tbody>
                 {customers.map((c) => (
-                  <tr
-                    key={c.email}
-                    className="border-t border-elite-border text-slate-300"
-                  >
-                    <td className="px-6 py-4">
-                      <p className="text-white font-medium">{c.name}</p>
+                  <tr key={c.email}>
+                    <td>
+                      <p className="font-display font-light italic text-base text-white">
+                        {c.name}
+                      </p>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1 text-xs text-slate-400 mb-1">
-                        <Mail className="w-3 h-3" />
+                    <td>
+                      <div className="flex items-center gap-2 text-xs text-elite-muted mb-1">
+                        <Mail className="w-3 h-3 text-elite-gold/60" />
                         {c.email}
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-slate-400">
-                        <Phone className="w-3 h-3" />
+                      <div className="flex items-center gap-2 text-xs text-elite-muted">
+                        <Phone className="w-3 h-3 text-elite-gold/60" />
                         {c.phone}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="flex items-center gap-1">
-                        <ShoppingBag className="w-4 h-4 text-elite-gold" />
+                    <td>
+                      <span className="inline-flex items-center gap-2 text-white/80">
+                        <ShoppingBag className="w-3.5 h-3.5 text-elite-gold/70" />
                         {c.orderCount}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-elite-gold font-medium">
-                      ${c.totalSpent.toFixed(2)}
+                    <td>
+                      <span className="font-display font-light italic text-elite-gold">
+                        ${c.totalSpent.toFixed(2)}
+                      </span>
                     </td>
-                    <td className="px-6 py-4 text-slate-400">
+                    <td className="text-elite-muted">
                       {new Date(c.lastOrder).toLocaleDateString()}
                     </td>
                   </tr>

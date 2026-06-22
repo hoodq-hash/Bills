@@ -9,11 +9,10 @@ import {
   Package,
   PackagePlus,
   LogOut,
-  Menu,
-  X,
-  Bell,
+  ExternalLink,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import { AdminPageHeader } from "./AdminUI";
 
 export type AdminSection =
   | "dashboard"
@@ -29,6 +28,8 @@ interface AdminShellProps {
   onSectionChange: (section: AdminSection) => void;
   onLogout: () => void;
   userName?: string;
+  headerTitle?: string;
+  headerSubtitle?: string;
   children: ReactNode;
 }
 
@@ -42,37 +43,43 @@ const menuItems: {
   { section: "orders", label: "Orders", icon: ShoppingBag, group: "Sales" },
   { section: "receipts", label: "Receipts", icon: Receipt, group: "Sales" },
   { section: "customers", label: "Customers", icon: Users, group: "Sales" },
-  { section: "allProducts", label: "All Bills", icon: Package, group: "Bills" },
-  { section: "addProduct", label: "Add Bill", icon: PackagePlus, group: "Bills" },
+  { section: "allProducts", label: "All Products", icon: Package, group: "Catalog" },
+  { section: "addProduct", label: "Add Product", icon: PackagePlus, group: "Catalog" },
 ];
 
 const sectionMeta: Record<
   Exclude<AdminSection, "logout">,
-  { title: string; subtitle: string }
+  { eyebrow: string; title: string; subtitle: string }
 > = {
   dashboard: {
-    title: "Dashboard",
-    subtitle: "Overview of your store performance",
+    eyebrow: "Overview",
+    title: "Store Dashboard",
+    subtitle: "Performance at a glance — orders, revenue, and catalog.",
   },
   orders: {
-    title: "Orders",
-    subtitle: "Manage and update customer orders",
+    eyebrow: "Sales",
+    title: "Order Management",
+    subtitle: "Review, update status, and fulfill customer orders.",
   },
   receipts: {
+    eyebrow: "Sales",
     title: "Receipts",
-    subtitle: "View and print order receipts",
+    subtitle: "Search and print official order receipts.",
   },
   customers: {
+    eyebrow: "Sales",
     title: "Customers",
-    subtitle: "Customer list from order history",
+    subtitle: "Client history compiled from order records.",
   },
   allProducts: {
-    title: "All Bills",
-    subtitle: "Manage your bill inventory",
+    eyebrow: "Catalog",
+    title: "Product Inventory",
+    subtitle: "View and manage all bills and catalog items.",
   },
   addProduct: {
-    title: "Add Bill",
-    subtitle: "Create a new bill listing",
+    eyebrow: "Catalog",
+    title: "Add Product",
+    subtitle: "Create or edit a product — preview updates live on the right.",
   },
 };
 
@@ -81,49 +88,85 @@ export function getSectionMeta(section: AdminSection) {
   return sectionMeta[section];
 }
 
+function Logo() {
+  return (
+    <Link href="/" className="flex items-center gap-3 group">
+      <div className="w-9 h-9 border border-elite-gold/70 flex items-center justify-center bg-black/40 group-hover:border-elite-gold transition-colors">
+        <span className="font-display font-light italic text-elite-gold text-lg leading-none">
+          E
+        </span>
+      </div>
+      <div>
+        <span className="block font-display font-light italic text-elite-gold text-base leading-tight">
+          Elite Notes
+        </span>
+        <span className="block font-sans text-[9px] tracking-[0.3em] uppercase text-white/40">
+          Admin
+        </span>
+      </div>
+    </Link>
+  );
+}
+
 export default function AdminShell({
   activeSection,
   onSectionChange,
   onLogout,
   userName = "Admin",
+  headerTitle,
+  headerSubtitle,
   children,
 }: AdminShellProps) {
   const groups = [...new Set(menuItems.map((i) => i.group))];
+  const meta = getSectionMeta(activeSection);
+  const title = headerTitle ?? meta.title;
+  const subtitle = headerSubtitle ?? meta.subtitle;
+  const initials = userName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <div className="min-h-screen bg-elite-bg">
-      <nav className="fixed top-0 left-0 right-0 bg-elite-surface border-b border-elite-border z-50 h-16">
-        <div className="flex items-center justify-between px-4 h-full">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-xl font-bold font-display text-elite-gold">
-              ELITE NOTES
+      <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/10 bg-black/90 backdrop-blur-md">
+        <div className="h-full zenith-container flex items-center justify-between">
+          <Logo />
+          <div className="flex items-center gap-4 md:gap-6">
+            <Link
+              href="/"
+              className="hidden sm:inline-flex items-center gap-2 font-sans text-[10px] uppercase tracking-[0.18em] text-white/50 hover:text-elite-gold transition-colors"
+            >
+              View Store
+              <ExternalLink className="w-3 h-3" />
             </Link>
-            <span className="hidden md:inline text-xs text-elite-muted border-l border-elite-border pl-4">
-              Admin Panel
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <button type="button" className="p-2 hover:bg-elite-card rounded-full relative">
-              <Bell className="w-5 h-5 text-slate-300" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
-            <div className="hidden md:block text-right">
-              <p className="text-sm font-medium text-white">{userName}</p>
-              <p className="text-xs text-slate-400">Administrator</p>
+            <div className="flex items-center gap-3 pl-4 border-l border-white/10">
+              <div className="w-8 h-8 border border-elite-gold/40 flex items-center justify-center bg-elite-gold/10">
+                <span className="font-sans text-[10px] font-medium text-elite-gold">
+                  {initials}
+                </span>
+              </div>
+              <div className="hidden md:block">
+                <p className="font-sans text-sm text-white/90">{userName}</p>
+                <p className="font-sans text-[10px] uppercase tracking-[0.15em] text-elite-muted">
+                  Administrator
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </nav>
+      </header>
 
       <div className="flex pt-16">
-        <aside className="hidden md:flex fixed left-0 top-16 w-64 h-[calc(100vh-4rem)] bg-elite-surface border-r border-elite-border flex-col">
-          <nav className="p-4 flex-1 overflow-y-auto">
+        <aside className="hidden md:flex fixed left-0 top-16 w-[240px] h-[calc(100vh-4rem)] border-r border-white/10 bg-[#0a0a0f] flex-col">
+          <nav className="flex-1 overflow-y-auto py-6">
             {groups.map((group) => (
-              <div key={group} className="mb-6">
-                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-3">
+              <div key={group} className="mb-8">
+                <p className="px-5 mb-3 font-sans text-[9px] uppercase tracking-[0.28em] text-elite-gold/70">
                   {group}
-                </h2>
-                <ul className="space-y-1">
+                </p>
+                <ul>
                   {menuItems
                     .filter((item) => item.group === group)
                     .map((item) => {
@@ -134,13 +177,9 @@ export default function AdminShell({
                           <button
                             type="button"
                             onClick={() => onSectionChange(item.section)}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
-                              active
-                                ? "bg-elite-gold text-black font-medium"
-                                : "text-slate-300 hover:bg-elite-card"
-                            }`}
+                            className={`admin-sidebar-link ${active ? "admin-sidebar-link-active" : ""}`}
                           >
-                            <Icon className="w-4 h-4" />
+                            <Icon className="w-4 h-4 shrink-0" strokeWidth={1.5} />
                             {item.label}
                           </button>
                         </li>
@@ -150,52 +189,60 @@ export default function AdminShell({
               </div>
             ))}
           </nav>
-          <div className="p-4 border-t border-elite-border">
+          <div className="p-4 border-t border-white/10">
             <button
               type="button"
               onClick={onLogout}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+              className="admin-sidebar-link text-red-400/70 hover:text-red-400 w-full"
             >
-              <LogOut className="w-4 h-4" />
-              Log out
+              <LogOut className="w-4 h-4" strokeWidth={1.5} />
+              Log Out
             </button>
           </div>
         </aside>
 
-        <main className="flex-1 w-full min-w-0 md:ml-64 p-4 md:p-6 pb-20 md:pb-6">
-          {activeSection !== "logout" && (
-            <div className="mb-6">
-              <h1 className="text-2xl md:text-3xl font-bold text-white font-display">
-                {getSectionMeta(activeSection).title}
-              </h1>
-              <p className="mt-1 text-slate-400">
-                {getSectionMeta(activeSection).subtitle}
-              </p>
-            </div>
-          )}
-          {children}
+        <main className="flex-1 min-w-0 md:ml-[240px]">
+          <div className="zenith-container py-8 md:py-10 pb-24 md:pb-10">
+            {activeSection !== "logout" && (
+              <AdminPageHeader
+                eyebrow={meta.eyebrow}
+                title={title}
+                subtitle={subtitle}
+              />
+            )}
+            {children}
+          </div>
         </main>
       </div>
 
-      {/* Mobile bottom nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-elite-surface border-t border-elite-border z-50 flex justify-around py-2">
-        {menuItems.slice(0, 5).map((item) => {
-          const Icon = item.icon;
-          return (
-            <button
-              key={item.section}
-              type="button"
-              onClick={() => onSectionChange(item.section)}
-              className={`flex flex-col items-center p-2 text-xs ${
-                activeSection === item.section ? "text-elite-gold" : "text-slate-400"
-              }`}
-            >
-              <Icon className="w-5 h-5 mb-0.5" />
-              {item.label.split(" ")[0]}
-            </button>
-          );
-        })}
-      </div>
+      {/* Mobile nav */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/95 backdrop-blur-md">
+        <div className="flex justify-around py-2">
+          {[
+            menuItems[0], // Dashboard
+            menuItems[1], // Orders
+            menuItems[4], // All Products
+            menuItems[5], // Add Product
+            menuItems[2], // Receipts
+          ].map((item) => {
+            const Icon = item.icon;
+            const active = activeSection === item.section;
+            return (
+              <button
+                key={item.section}
+                type="button"
+                onClick={() => onSectionChange(item.section)}
+                className={`flex flex-col items-center gap-1 px-2 py-1.5 font-sans text-[9px] uppercase tracking-wider ${
+                  active ? "text-elite-gold" : "text-white/40"
+                }`}
+              >
+                <Icon className="w-4 h-4" strokeWidth={1.5} />
+                {item.label.split(" ")[0]}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }

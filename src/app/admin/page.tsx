@@ -57,7 +57,7 @@ export default function AdminPage() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-elite-bg flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-elite-gold" />
+        <div className="w-8 h-8 border border-elite-gold/30 border-t-elite-gold animate-spin" />
       </div>
     );
   }
@@ -71,6 +71,16 @@ export default function AdminPage() {
         router.push("/login");
       }}
       userName={user?.name || "Admin"}
+      headerTitle={
+        activeSection === "addProduct" && editingProduct
+          ? "Edit Product"
+          : undefined
+      }
+      headerSubtitle={
+        activeSection === "addProduct" && editingProduct
+          ? `Updating "${editingProduct.title}"`
+          : undefined
+      }
     >
       {activeSection === "dashboard" && <DashboardOverview />}
       {activeSection === "orders" && <OrdersPanel />}
@@ -81,6 +91,10 @@ export default function AdminPage() {
           mode="list"
           editingProduct={null}
           onEdit={handleEditProduct}
+          onAdd={() => {
+            setEditingProduct(null);
+            setActiveSection("addProduct");
+          }}
           onCancelEdit={() => setActiveSection("allProducts")}
           onSaved={handleProductSaved}
         />

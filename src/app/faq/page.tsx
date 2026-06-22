@@ -1,5 +1,7 @@
-"use client"
-import React, { useState } from "react";
+"use client";
+
+import { useState } from "react";
+import { SITE_PHONE_DISPLAY } from "@/constants/site";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 import { 
@@ -93,7 +95,7 @@ export default function FAQPage() {
         {
           id: "s4q1",
           question: "How can I contact customer support?",
-          answer: "Our support team is available 24/7 through live chat, email, and secure messaging platforms."
+          answer: `Our support team is available 24/7. Call us at ${SITE_PHONE_DISPLAY}, email, or reach out through secure messaging.`
         },
         {
           id: "s4q2",

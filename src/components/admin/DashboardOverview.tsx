@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  ShoppingBag,
-  Clock,
-  DollarSign,
-  Users,
-  Package,
-  TrendingUp,
-} from "lucide-react";
+import { ShoppingBag, Clock, DollarSign, Users, Package, TrendingUp } from "lucide-react";
 import type { AdminStats, Order } from "@/types";
+import { AdminLoading, AdminEmpty, StatusBadge } from "./AdminUI";
+
+const statConfig = [
+  { key: "totalOrders" as const, label: "Total Orders", icon: ShoppingBag, format: (v: number) => String(v) },
+  { key: "pendingOrders" as const, label: "Pending", icon: Clock, format: (v: number) => String(v) },
+  { key: "totalRevenue" as const, label: "Revenue (Paid)", icon: DollarSign, format: (v: number) => `$${v.toFixed(2)}` },
+  { key: "totalCustomers" as const, label: "Customers", icon: Users, format: (v: number) => String(v) },
+  { key: "totalProducts" as const, label: "Bills Listed", icon: Package, format: (v: number) => String(v) },
+  { key: "paidOrders" as const, label: "Paid Orders", icon: TrendingUp, format: (v: number) => String(v) },
+];
 
 export default function DashboardOverview() {
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -35,106 +38,53 @@ export default function DashboardOverview() {
     load();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-elite-gold" />
-      </div>
-    );
-  }
-
-  const cards = [
-    {
-      label: "Total Orders",
-      value: stats?.totalOrders ?? 0,
-      icon: ShoppingBag,
-      color: "text-blue-400",
-    },
-    {
-      label: "Pending",
-      value: stats?.pendingOrders ?? 0,
-      icon: Clock,
-      color: "text-yellow-400",
-    },
-    {
-      label: "Revenue (Paid)",
-      value: `$${(stats?.totalRevenue ?? 0).toFixed(2)}`,
-      icon: DollarSign,
-      color: "text-elite-gold",
-    },
-    {
-      label: "Customers",
-      value: stats?.totalCustomers ?? 0,
-      icon: Users,
-      color: "text-purple-400",
-    },
-    {
-      label: "Bills",
-      value: stats?.totalProducts ?? 0,
-      icon: Package,
-      color: "text-green-400",
-    },
-    {
-      label: "Paid Orders",
-      value: stats?.paidOrders ?? 0,
-      icon: TrendingUp,
-      color: "text-cyan-400",
-    },
-  ];
+  if (loading) return <AdminLoading />;
 
   return (
-    <div className="space-y-6 pb-20 md:pb-0">
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        {cards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <div
-              key={card.label}
-              className="bg-elite-surface border border-elite-border rounded-xl p-5"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <Icon className={`w-5 h-5 ${card.color}`} />
-              </div>
-              <p className="text-2xl font-bold text-white">{card.value}</p>
-              <p className="text-sm text-slate-400 mt-1">{card.label}</p>
-            </div>
-          );
-        })}
+    <div className="space-y-8 pb-20 md:pb-0">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+        {statConfig.map(({ key, label, icon: Icon, format }) => (
+          <div key={key} className="admin-stat-card">
+            <Icon className="w-4 h-4 text-elite-gold/60 mb-4" strokeWidth={1.5} />
+            <p className="admin-stat-value">{format(stats?.[key] ?? 0)}</p>
+            <p className="admin-stat-label">{label}</p>
+          </div>
+        ))}
       </div>
 
-      <div className="bg-elite-surface border border-elite-border rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-elite-border">
-          <h2 className="text-lg font-semibold text-white">Recent Orders</h2>
+      <div className="admin-card">
+        <div className="admin-card-header">
+          <h2 className="admin-card-title">Recent Orders</h2>
+          <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-elite-muted">
+            Last 5
+          </span>
         </div>
         {recentOrders.length === 0 ? (
-          <p className="text-slate-400 text-center py-12">No orders yet</p>
+          <AdminEmpty message="No orders yet" />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-elite-bg/50 text-slate-400">
+            <table className="admin-table">
+              <thead>
                 <tr>
-                  <th className="text-left px-6 py-3">Order #</th>
-                  <th className="text-left px-6 py-3">Customer</th>
-                  <th className="text-left px-6 py-3">Total</th>
-                  <th className="text-left px-6 py-3">Status</th>
-                  <th className="text-left px-6 py-3">Date</th>
+                  <th>Order #</th>
+                  <th>Customer</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Date</th>
                 </tr>
               </thead>
               <tbody>
                 {recentOrders.map((order) => (
-                  <tr
-                    key={order._id}
-                    className="border-t border-elite-border text-slate-300"
-                  >
-                    <td className="px-6 py-3 font-mono text-elite-gold">
-                      {order.orderNumber}
-                    </td>
-                    <td className="px-6 py-3">
+                  <tr key={order._id}>
+                    <td className="font-mono text-elite-gold text-xs">{order.orderNumber}</td>
+                    <td>
                       {order.customer.firstName} {order.customer.lastName}
                     </td>
-                    <td className="px-6 py-3">${order.total.toFixed(2)}</td>
-                    <td className="px-6 py-3 capitalize">{order.status}</td>
-                    <td className="px-6 py-3">
+                    <td className="text-white">${order.total.toFixed(2)}</td>
+                    <td>
+                      <StatusBadge status={order.status} />
+                    </td>
+                    <td className="text-elite-muted">
                       {order.createdAt
                         ? new Date(order.createdAt).toLocaleDateString()
                         : "—"}

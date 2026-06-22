@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Eye, Trash2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import type { Order, OrderStatus, PaymentStatus } from "@/types";
+import { AdminLoading, AdminEmpty, StatusBadge } from "./AdminUI";
 
 const STATUS_OPTIONS: OrderStatus[] = [
   "pending",
@@ -15,27 +16,6 @@ const STATUS_OPTIONS: OrderStatus[] = [
 ];
 
 const PAYMENT_OPTIONS: PaymentStatus[] = ["pending", "paid", "failed"];
-
-function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    pending: "bg-yellow-500/20 text-yellow-400",
-    paid: "bg-green-500/20 text-green-400",
-    processing: "bg-blue-500/20 text-blue-400",
-    shipped: "bg-purple-500/20 text-purple-400",
-    delivered: "bg-emerald-500/20 text-emerald-400",
-    cancelled: "bg-red-500/20 text-red-400",
-    failed: "bg-red-500/20 text-red-400",
-  };
-  return (
-    <span
-      className={`px-2 py-0.5 rounded text-xs font-medium capitalize ${
-        colors[status] || "bg-slate-500/20 text-slate-400"
-      }`}
-    >
-      {status}
-    </span>
-  );
-}
 
 export default function OrdersPanel() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -90,21 +70,15 @@ export default function OrdersPanel() {
     filter === "all" ? true : o.status === filter
   );
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-elite-gold" />
-      </div>
-    );
-  }
+  if (loading) return <AdminLoading />;
 
   return (
-    <div className="space-y-4 pb-20 md:pb-0">
+    <div className="space-y-6 pb-20 md:pb-0">
       <div className="flex flex-wrap gap-3 items-center justify-between">
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="bg-elite-surface border border-elite-border text-white px-4 py-2 rounded-lg text-sm"
+          className="admin-select w-auto min-w-[160px]"
         >
           <option value="all">All statuses</option>
           {STATUS_OPTIONS.map((s) => (
@@ -113,68 +87,68 @@ export default function OrdersPanel() {
             </option>
           ))}
         </select>
-        <button
-          type="button"
-          onClick={fetchOrders}
-          className="flex items-center gap-2 px-4 py-2 bg-elite-surface border border-elite-border text-slate-300 rounded-lg hover:border-elite-gold text-sm"
-        >
-          <RefreshCw className="w-4 h-4" />
+        <button type="button" onClick={fetchOrders} className="btn-ghost-gold gap-2">
+          <RefreshCw className="w-3.5 h-3.5" />
           Refresh
         </button>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2 bg-elite-surface border border-elite-border rounded-xl overflow-hidden">
+        <div className="xl:col-span-2 admin-card overflow-hidden">
           {filtered.length === 0 ? (
-            <p className="text-slate-400 text-center py-16">No orders found</p>
+            <AdminEmpty message="No orders found" />
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-elite-bg/50 text-slate-400">
+              <table className="admin-table">
+                <thead>
                   <tr>
-                    <th className="text-left px-4 py-3">Order</th>
-                    <th className="text-left px-4 py-3">Customer</th>
-                    <th className="text-left px-4 py-3">Total</th>
-                    <th className="text-left px-4 py-3">Status</th>
-                    <th className="text-left px-4 py-3">Payment</th>
-                    <th className="px-4 py-3" />
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th />
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((order) => (
                     <tr
                       key={order._id}
-                      className={`border-t border-elite-border cursor-pointer hover:bg-elite-bg/30 ${
-                        selected?._id === order._id ? "bg-elite-bg/50" : ""
+                      className={`cursor-pointer ${
+                        selected?._id === order._id ? "bg-elite-gold/[0.04]" : ""
                       }`}
                       onClick={() => setSelected(order)}
                     >
-                      <td className="px-4 py-3 font-mono text-elite-gold text-xs">
+                      <td className="font-mono text-elite-gold text-xs">
                         {order.orderNumber}
                       </td>
-                      <td className="px-4 py-3 text-slate-300">
-                        <div>{order.customer.firstName} {order.customer.lastName}</div>
-                        <div className="text-xs text-slate-500">{order.customer.email}</div>
+                      <td>
+                        <div className="text-white/90">
+                          {order.customer.firstName} {order.customer.lastName}
+                        </div>
+                        <div className="text-xs text-elite-muted mt-0.5">
+                          {order.customer.email}
+                        </div>
                       </td>
-                      <td className="px-4 py-3 text-white font-medium">
+                      <td className="text-white font-medium">
                         ${order.total.toFixed(2)}
                       </td>
-                      <td className="px-4 py-3">
+                      <td>
                         <StatusBadge status={order.status} />
                       </td>
-                      <td className="px-4 py-3">
+                      <td>
                         <StatusBadge status={order.paymentStatus} />
                       </td>
-                      <td className="px-4 py-3">
+                      <td>
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelected(order);
                           }}
-                          className="p-1.5 hover:bg-elite-card rounded"
+                          className="p-1.5 text-elite-muted hover:text-elite-gold transition-colors"
                         >
-                          <Eye className="w-4 h-4 text-slate-400" />
+                          <Eye className="w-4 h-4" strokeWidth={1.5} />
                         </button>
                       </td>
                     </tr>
@@ -185,48 +159,67 @@ export default function OrdersPanel() {
           )}
         </div>
 
-        <div className="bg-elite-surface border border-elite-border rounded-xl p-5">
+        <div className="admin-card p-6">
           {selected ? (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <p className="text-xs text-slate-500 uppercase">Order</p>
+                <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-elite-muted mb-1">
+                  Order
+                </p>
                 <p className="font-mono text-elite-gold">{selected.orderNumber}</p>
               </div>
+
               <div>
-                <p className="text-xs text-slate-500 uppercase mb-1">Customer</p>
-                <p className="text-white">
+                <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-elite-muted mb-2">
+                  Customer
+                </p>
+                <p className="font-display font-light italic text-lg text-white">
                   {selected.customer.firstName} {selected.customer.lastName}
                 </p>
-                <p className="text-sm text-slate-400">{selected.customer.email}</p>
-                <p className="text-sm text-slate-400">{selected.customer.phone}</p>
+                <p className="text-sm text-elite-muted mt-1">{selected.customer.email}</p>
+                <p className="text-sm text-elite-muted">{selected.customer.phone}</p>
               </div>
+
               <div>
-                <p className="text-xs text-slate-500 uppercase mb-2">Items</p>
-                <ul className="space-y-2 text-sm text-slate-300">
+                <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-elite-muted mb-2">
+                  Items
+                </p>
+                <ul className="space-y-2 text-sm">
                   {selected.items.map((item, i) => (
-                    <li key={i} className="flex justify-between border-b border-elite-border pb-2">
+                    <li
+                      key={i}
+                      className="flex justify-between gap-3 border-b border-white/5 pb-2 text-white/80"
+                    >
                       <span className="line-clamp-1">{item.title}</span>
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="text-elite-gold shrink-0">
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="text-sm space-y-1 text-slate-400">
-                <div className="flex justify-between">
+
+              <div className="text-sm space-y-1.5 pt-2 border-t border-white/10">
+                <div className="flex justify-between text-elite-muted">
                   <span>Subtotal</span>
                   <span>${selected.subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-elite-muted">
                   <span>Shipping</span>
                   <span>${selected.shippingCost.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-white font-bold text-base pt-2 border-t border-elite-border">
+                <div className="flex justify-between text-white font-medium pt-2">
                   <span>Total</span>
-                  <span className="text-elite-gold">${selected.total.toFixed(2)}</span>
+                  <span className="font-display font-light italic text-xl text-elite-gold">
+                    ${selected.total.toFixed(2)}
+                  </span>
                 </div>
               </div>
+
               <div>
-                <label className="text-xs text-slate-500 uppercase">Order Status</label>
+                <label className="font-sans text-[10px] uppercase tracking-[0.2em] text-elite-muted">
+                  Order Status
+                </label>
                 <select
                   value={selected.status}
                   onChange={(e) =>
@@ -234,7 +227,7 @@ export default function OrdersPanel() {
                       status: e.target.value as OrderStatus,
                     })
                   }
-                  className="w-full mt-1 bg-elite-bg border border-elite-border text-white px-3 py-2 rounded-lg text-sm"
+                  className="admin-select mt-2"
                 >
                   {STATUS_OPTIONS.map((s) => (
                     <option key={s} value={s}>
@@ -243,8 +236,11 @@ export default function OrdersPanel() {
                   ))}
                 </select>
               </div>
+
               <div>
-                <label className="text-xs text-slate-500 uppercase">Payment Status</label>
+                <label className="font-sans text-[10px] uppercase tracking-[0.2em] text-elite-muted">
+                  Payment Status
+                </label>
                 <select
                   value={selected.paymentStatus}
                   onChange={(e) =>
@@ -252,7 +248,7 @@ export default function OrdersPanel() {
                       paymentStatus: e.target.value as PaymentStatus,
                     })
                   }
-                  className="w-full mt-1 bg-elite-bg border border-elite-border text-white px-3 py-2 rounded-lg text-sm"
+                  className="admin-select mt-2"
                 >
                   {PAYMENT_OPTIONS.map((s) => (
                     <option key={s} value={s}>
@@ -261,25 +257,28 @@ export default function OrdersPanel() {
                   ))}
                 </select>
               </div>
-              <p className="text-xs text-slate-500">
-                Payment: {selected.paymentMethod} · Shipping: {selected.shippingMethod}
+
+              <p className="text-xs text-elite-muted">
+                {selected.paymentMethod} · {selected.shippingMethod}
               </p>
+
               {selected.notes && (
-                <p className="text-sm text-slate-400 italic">Note: {selected.notes}</p>
+                <p className="text-sm text-white/60 italic border-l-2 border-elite-gold/40 pl-3">
+                  {selected.notes}
+                </p>
               )}
+
               <button
                 type="button"
                 onClick={() => deleteOrder(selected._id)}
-                className="flex items-center gap-2 text-red-400 hover:text-red-300 text-sm"
+                className="flex items-center gap-2 text-red-400/80 hover:text-red-400 text-xs uppercase tracking-wider transition-colors"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3.5 h-3.5" />
                 Delete order
               </button>
             </div>
           ) : (
-            <p className="text-slate-500 text-center py-12">
-              Select an order to view details
-            </p>
+            <AdminEmpty message="Select an order to view details" />
           )}
         </div>
       </div>
