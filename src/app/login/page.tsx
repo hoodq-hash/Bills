@@ -6,6 +6,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import Logo from "@/components/Logo/Logo";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -44,16 +45,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col bg-elite-bg">
       <header className="border-b border-white/10">
         <div className="zenith-container flex items-center h-16">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 border border-elite-gold/70 flex items-center justify-center bg-black/40">
-              <span className="font-display font-light italic text-elite-gold text-lg leading-none">
-                E
-              </span>
-            </div>
-            <span className="font-display font-light italic text-elite-gold text-lg">
-              Elite Notes
-            </span>
-          </Link>
+          <Logo />
         </div>
       </header>
 

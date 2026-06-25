@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MenuIcon, ShoppingCartIcon, XIcon } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import CartPanel from "@/components/Cart/CartPanel";
+import Logo from "@/components/Logo/Logo";
 
 interface NavbarProps {
   variant?: "default" | "hero";
@@ -20,33 +22,13 @@ const navLinks = [
   { href: "/ascorbicacid", label: "Ascorbic Acid" },
 ];
 
-function Logo() {
-  return (
-    <Link href="/" className="flex items-center gap-3 group">
-      <div className="w-10 h-10 border border-elite-gold/80 flex items-center justify-center bg-black/30 group-hover:border-elite-gold transition-colors">
-        <span className="font-display font-light italic text-elite-gold text-xl leading-none">
-          E
-        </span>
-      </div>
-      <div className="hidden sm:block">
-        <span className="block font-display font-light italic text-elite-gold text-lg leading-tight tracking-wide">
-          Elite Notes
-        </span>
-        <span className="block font-sans text-[9px] tracking-[0.35em] uppercase text-white/50">
-          Premium Since 2018
-        </span>
-      </div>
-    </Link>
-  );
-}
-
 export default function Navbar({ variant = "default" }: NavbarProps) {
   const isHero = variant === "hero";
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { cartItems } = useCart();
-  const cartCount = cartItems?.length || 0;
+  const { getCartItemsCount, toggleCart, closeCart, isCartOpen } = useCart();
+  const cartCount = getCartItemsCount();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -56,11 +38,18 @@ export default function Navbar({ variant = "default" }: NavbarProps) {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
+    const shouldLock =
+      menuOpen || (isCartOpen && typeof window !== "undefined" && window.innerWidth < 768);
+    document.body.style.overflow = shouldLock ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [menuOpen]);
+  }, [menuOpen, isCartOpen]);
+
+  useEffect(() => {
+    closeCart();
+    setMenuOpen(false);
+  }, [pathname, closeCart]);
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -78,8 +67,8 @@ export default function Navbar({ variant = "default" }: NavbarProps) {
       <header
         className={`${isHero ? "fixed" : "sticky"} top-0 left-0 right-0 z-50 transition-all duration-500 ${headerBg}`}
       >
-        <div className="zenith-container flex items-center justify-between gap-6 h-[4.25rem] md:h-[4.75rem]">
-          <Logo />
+        <div className="zenith-container flex items-center justify-between gap-6 h-[5rem] md:h-[5.5rem]">
+          <Logo priority={isHero} size="md" />
 
           <nav className="hidden xl:flex items-center gap-6 2xl:gap-8 flex-1 justify-center">
             {navLinks.map((link) => (
@@ -96,18 +85,23 @@ export default function Navbar({ variant = "default" }: NavbarProps) {
           </nav>
 
           <div className="flex items-center gap-2 md:gap-4">
-            <Link
-              href="/cart"
-              className="relative p-2 text-white/70 hover:text-elite-gold transition-colors"
-              aria-label="Cart"
-            >
-              <ShoppingCartIcon className="w-[18px] h-[18px]" strokeWidth={1.5} />
-              {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-elite-gold text-black text-[9px] font-semibold flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={toggleCart}
+                className="relative p-2 text-white/70 hover:text-elite-gold transition-colors"
+                aria-label="Open cart"
+                aria-expanded={isCartOpen}
+              >
+                <ShoppingCartIcon className="w-[18px] h-[18px]" strokeWidth={1.5} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-elite-gold text-black text-[9px] font-semibold flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+              <CartPanel variant="desktop" />
+            </div>
             <button
               type="button"
               className="xl:hidden p-2 text-white/80"
@@ -119,6 +113,8 @@ export default function Navbar({ variant = "default" }: NavbarProps) {
           </div>
         </div>
       </header>
+
+      <CartPanel variant="mobile" />
 
       {/* Mobile menu */}
       <div
@@ -153,6 +149,21 @@ export default function Navbar({ variant = "default" }: NavbarProps) {
               {link.label}
             </Link>
           ))}
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              toggleCart();
+            }}
+            className="w-full flex items-center justify-between px-4 py-3 font-sans text-xs uppercase tracking-[0.15em] text-white/75 hover:text-elite-gold transition-colors"
+          >
+            <span>Cart</span>
+            {cartCount > 0 && (
+              <span className="min-w-[18px] h-[18px] px-1 bg-elite-gold text-black text-[9px] font-semibold flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </button>
         </nav>
       </div>
     </>

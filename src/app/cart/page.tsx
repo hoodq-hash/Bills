@@ -9,6 +9,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import Footer from "@/components/Footer/Footer";
+import Logo from "@/components/Logo/Logo";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 
@@ -27,11 +28,7 @@ const CheckoutNav = ({ currentStep = 1 }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0">
-            <Link href="/" className="flex items-center space-x-2 group">
-              <span className="text-2xl font-bold text-elite-gold group-hover:text-elite-gold-light transition-all duration-300">
-                ELITE NOTES
-              </span>
-            </Link>
+            <Logo size="sm" />
           </div>
 
           <div className="hidden sm:flex items-center space-x-4">

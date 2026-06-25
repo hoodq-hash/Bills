@@ -35,12 +35,14 @@ export default function HeroSlider() {
             src={slide.src}
             alt={slide.alt}
             fill
+            quality={95}
+            sizes="100vw"
             className="object-cover"
             priority={i === 0}
           />
         </div>
       ))}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-elite-bg" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/40 to-elite-bg" />
 
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3">
         {SLIDES.map((_, i) => (

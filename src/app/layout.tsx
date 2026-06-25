@@ -5,6 +5,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { Toaster } from "sonner";
+import { SITE_LOGO } from "@/constants/site";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -24,6 +25,11 @@ export const metadata: Metadata = {
   title: "Elite Notes",
   description:
     "Elite Notes — premium currency solutions and discreet worldwide delivery.",
+  icons: {
+    icon: SITE_LOGO,
+    shortcut: SITE_LOGO,
+    apple: SITE_LOGO,
+  },
 };
 
 function Providers({ children }: { children: ReactNode }) {

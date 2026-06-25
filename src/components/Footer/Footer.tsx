@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "@/components/Logo/Logo";
 import { SITE_EMAIL, SITE_PHONE, SITE_PHONE_DISPLAY } from "@/constants/site";
 
 const footerLinks = {
@@ -26,12 +27,7 @@ export default function Footer() {
       <div className="zenith-container py-16 md:py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div className="lg:col-span-1">
-            <p className="text-[10px] tracking-[0.35em] uppercase text-elite-gold/80 mb-2">
-              Elite Notes
-            </p>
-            <h2 className="font-display text-2xl font-bold text-white tracking-wide mb-4">
-              ELITE NOTES
-            </h2>
+            <Logo size="lg" className="mb-5" />
             <p className="text-elite-muted text-sm leading-relaxed max-w-xs">
               Premium currency solutions and discreet worldwide delivery — trusted
               since 2018.

@@ -13,6 +13,7 @@ const CartContext = createContext<CartContextValue | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
@@ -29,6 +30,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
+
+  const openCart = () => setIsCartOpen(true);
+  const closeCart = () => setIsCartOpen(false);
+  const toggleCart = () => setIsCartOpen((prev) => !prev);
 
   const addToCart = (product: CartItem) => {
     setCartItems((prevItems) => {
@@ -55,6 +60,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       return [...prevItems, processedProduct];
     });
+    openCart();
   };
 
   const removeFromCart = (productId: string, selectedAmount: string) => {
@@ -110,6 +116,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     <CartContext.Provider
       value={{
         cartItems,
+        isCartOpen,
+        openCart,
+        closeCart,
+        toggleCart,
         addToCart,
         removeFromCart,
         updateItemQuantity,

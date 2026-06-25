@@ -49,6 +49,10 @@ export interface AuthContextValue {
 
 export interface CartContextValue {
   cartItems: CartItem[];
+  isCartOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
+  toggleCart: () => void;
   addToCart: (product: CartItem) => void;
   removeFromCart: (productId: string, selectedAmount: string) => void;
   updateItemQuantity: (

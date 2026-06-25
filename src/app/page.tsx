@@ -24,29 +24,53 @@ const services = [
     title: "Premium Bills",
     description:
       "High-quality undetectable bills in USD, EUR, GBP, and CAD — crafted to pass standard checks and look genuine in hand.",
+    backgroundImage: "/images/premium-bills-bg.jpg",
   },
   {
     title: "Discreet Delivery",
     description:
       "Every order ships with 100% confidential packaging and tracked delivery options worldwide.",
+    backgroundImage: "/images/discreet-delivery-bg.jpg",
   },
   {
     title: "Ascorbic Acid",
     description:
       "Lab-grade and commercial ascorbic acid products available through our curated catalog with fast fulfillment.",
+    backgroundImage: "/acid/WhatsApp Image 2026-06-25 at 11.42.48 AM.jpeg",
   },
   {
     title: "Long-Term Trust",
     description:
       "Trusted since 2018 — we build enduring relationships with clients who value quality, discretion, and reliability.",
+    backgroundImage: "/images/trust-bg.webp",
   },
 ];
 
 const markets = [
-  { flag: "🇺🇸", region: "United States", detail: "USD bills — nationwide discreet shipping" },
-  { flag: "🇪🇺", region: "European Union", detail: "Euro bills — EU & UK corridors" },
-  { flag: "🇬🇧", region: "United Kingdom", detail: "GBP bills — premium sterling notes" },
-  { flag: "🇨🇦", region: "Canada", detail: "CAD bills — fast North American delivery" },
+  {
+    region: "United States",
+    detail: "USD bills — nationwide discreet shipping",
+    backgroundImage: "/usd/WhatsApp Image 2026-06-25 at 11.44.00 AM.jpeg",
+    href: "/usdbills",
+  },
+  {
+    region: "European Union",
+    detail: "Euro bills — EU & UK corridors",
+    backgroundImage: "/euro/WhatsApp Image 2026-06-25 at 11.43.43 AM.jpeg",
+    href: "/eurobills",
+  },
+  {
+    region: "United Kingdom",
+    detail: "GBP bills — premium sterling notes",
+    backgroundImage: "/pounds/WhatsApp Image 2026-06-25 at 11.43.15 AM.jpeg",
+    href: "/gbpbills",
+  },
+  {
+    region: "Canada",
+    detail: "CAD bills — fast North American delivery",
+    backgroundImage: "/usd/WhatsApp Image 2026-06-25 at 11.43.58 AM.jpeg",
+    href: "/cadbills",
+  },
 ];
 
 function ProductGrid({ products }: { products: Product[] }) {
@@ -72,6 +96,8 @@ function ProductGrid({ products }: { products: Product[] }) {
                 src={product.image}
                 alt={product.title}
                 fill
+                quality={95}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
             )}
@@ -122,7 +148,7 @@ export default function HomePage() {
       <Navbar variant="hero" />
 
       {/* Hero */}
-      <section className="relative min-h-screen flex items-center justify-center pt-24 md:pt-28 pb-24">
+      <section className="relative min-h-screen flex items-center justify-center pt-28 md:pt-32 pb-24">
         <HeroSlider />
 
         <div className="relative z-10 zenith-container text-center max-w-4xl px-4">
@@ -179,16 +205,48 @@ export default function HomePage() {
             subtitle="We don't just supply products — we deliver discreet, premium-grade currency and chemical solutions trusted by clients worldwide."
           />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {services.map((service) => (
-              <div key={service.title} className="zenith-card">
-                <h3 className="font-display text-xl text-white mb-3">
-                  {service.title}
-                </h3>
-                <p className="text-elite-muted text-sm leading-relaxed">
-                  {service.description}
-                </p>
-              </div>
-            ))}
+            {services.map((service) => {
+              const hasBg = "backgroundImage" in service && service.backgroundImage;
+
+              if (hasBg) {
+                return (
+                  <div
+                    key={service.title}
+                    className="relative overflow-hidden border border-elite-border/80 min-h-[220px]"
+                  >
+                    <Image
+                      src={encodeURI(service.backgroundImage)}
+                      alt=""
+                      fill
+                      quality={95}
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                      aria-hidden
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10" />
+                    <div className="relative z-10 p-8 h-full flex flex-col justify-end">
+                      <h3 className="font-display font-light italic text-xl text-white mb-3">
+                        {service.title}
+                      </h3>
+                      <p className="text-white/80 text-sm leading-relaxed">
+                        {service.description}
+                      </p>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={service.title} className="zenith-card">
+                  <h3 className="font-display text-xl text-white mb-3">
+                    {service.title}
+                  </h3>
+                  <p className="text-elite-muted text-sm leading-relaxed">
+                    {service.description}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -203,13 +261,27 @@ export default function HomePage() {
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {markets.map((market) => (
-              <div key={market.region} className="zenith-card text-center">
-                <span className="text-3xl mb-4 block">{market.flag}</span>
-                <h4 className="font-display text-lg text-white mb-2">
-                  {market.region}
-                </h4>
-                <p className="text-elite-muted text-sm">{market.detail}</p>
-              </div>
+              <Link
+                key={market.region}
+                href={market.href}
+                className="group relative overflow-hidden border border-elite-border/80 min-h-[260px] block"
+              >
+                <Image
+                  src={encodeURI(market.backgroundImage)}
+                  alt={market.region}
+                  fill
+                  quality={95}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/15 group-hover:from-black/70 transition-colors" />
+                <div className="relative z-10 p-6 h-full flex flex-col justify-end text-center sm:text-left">
+                  <h4 className="font-display font-light italic text-xl text-white mb-2">
+                    {market.region}
+                  </h4>
+                  <p className="text-white/80 text-sm leading-relaxed">{market.detail}</p>
+                </div>
+              </Link>
             ))}
           </div>
         </div>

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { AdminPageHeader } from "./AdminUI";
+import Logo from "@/components/Logo/Logo";
 
 export type AdminSection =
   | "dashboard"
@@ -88,26 +89,6 @@ export function getSectionMeta(section: AdminSection) {
   return sectionMeta[section];
 }
 
-function Logo() {
-  return (
-    <Link href="/" className="flex items-center gap-3 group">
-      <div className="w-9 h-9 border border-elite-gold/70 flex items-center justify-center bg-black/40 group-hover:border-elite-gold transition-colors">
-        <span className="font-display font-light italic text-elite-gold text-lg leading-none">
-          E
-        </span>
-      </div>
-      <div>
-        <span className="block font-display font-light italic text-elite-gold text-base leading-tight">
-          Elite Notes
-        </span>
-        <span className="block font-sans text-[9px] tracking-[0.3em] uppercase text-white/40">
-          Admin
-        </span>
-      </div>
-    </Link>
-  );
-}
-
 export default function AdminShell({
   activeSection,
   onSectionChange,
@@ -132,7 +113,12 @@ export default function AdminShell({
     <div className="min-h-screen bg-elite-bg">
       <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/10 bg-black/90 backdrop-blur-md">
         <div className="h-full zenith-container flex items-center justify-between">
-          <Logo />
+          <div className="flex items-center gap-3">
+            <Logo size="sm" />
+            <span className="font-sans text-[9px] tracking-[0.3em] uppercase text-white/40 hidden sm:block">
+              Admin
+            </span>
+          </div>
           <div className="flex items-center gap-4 md:gap-6">
             <Link
               href="/"
