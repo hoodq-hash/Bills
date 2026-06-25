@@ -95,7 +95,7 @@ export default function FAQPage() {
         {
           id: "s4q1",
           question: "How can I contact customer support?",
-          answer: `Our support team is available 24/7. Call us at ${SITE_PHONE_DISPLAY}, email, or reach out through secure messaging.`
+          answer: `Our support team is available 24/7. Message us on WhatsApp at ${SITE_PHONE_DISPLAY}, email, or reach out through secure messaging.`,
         },
         {
           id: "s4q2",
