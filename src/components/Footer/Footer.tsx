@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Logo from "@/components/Logo/Logo";
-import { SITE_EMAIL, SITE_PHONE, SITE_PHONE_DISPLAY } from "@/constants/site";
+import WhatsAppLink from "@/components/WhatsAppLink";
+import { SITE_EMAIL } from "@/constants/site";
 
 const footerLinks = {
   company: [
@@ -84,12 +85,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a
-                  href={`tel:${SITE_PHONE}`}
-                  className="hover:text-elite-gold transition-colors"
-                >
-                  {SITE_PHONE_DISPLAY}
-                </a>
+                <WhatsAppLink />
               </li>
             </ul>
             <ul className="mt-6 space-y-3">
